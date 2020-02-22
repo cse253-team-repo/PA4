@@ -6,13 +6,14 @@ import pickle
 import numpy as np
 import nltk
 from PIL import Image
-from build_vocab import Vocabulary
+from get_vocab import Vocabulary
 from pycocotools.coco import COCO
+import json as js
 
 
 class CocoDataset(data.Dataset):
     """COCO Custom Dataset compatible with torch.utils.data.DataLoader."""
-    def __init__(self, root, json, ids, vocab, transform=None):
+    def __init__(self, root, json, ids, vocab, transform):
         """Set the path for images, captions and vocabulary wrapper.
         
         Args:
@@ -32,7 +33,9 @@ class CocoDataset(data.Dataset):
         coco = self.coco
         vocab = self.vocab
         ann_id = self.ids[index]
+        print("ann id: ", ann_id)
         caption = coco.anns[ann_id]['caption']
+        print("caption: ", caption)
         img_id = coco.anns[ann_id]['image_id']
         path = coco.loadImgs(img_id)[0]['file_name']
 
@@ -99,8 +102,37 @@ def get_loader(root, json, ids, vocab, transform, batch_size, shuffle, num_worke
     # captions: a tensor of shape (batch_size, padded_length).
     # lengths: a list indicating valid length for each caption. length is (batch_size).
     data_loader = torch.utils.data.DataLoader(dataset=coco, 
-                                              batch_size=batch_size,
+                                              batch_size=1,
                                               shuffle=shuffle,
                                               num_workers=num_workers,
                                               collate_fn=collate_fn)
     return data_loader
+
+
+if __name__ == "__main__":
+    root_train = "/datasets/home/53/953/cs253wi20ai/PA4/data/images/train"
+    json_train = "/datasets/home/53/953/cs253wi20ai/PA4/data/annotations/captions_train2014.json"
+    
+    with open("data/vocab.pkl", 'rb') as f:
+        vocab = pickle.load(f)
+
+    with open("data/ids.pkl", 'rb') as f:
+        ids = pickle.load(f)
+
+    with open("data/annotations/ids_train.json", 'rb') as f:
+        ids = js.load(f)['ids']
+
+    
+    transform = transforms.Compose([ 
+        # transforms.RandomCrop(224),
+        transforms.RandomHorizontalFlip(), 
+        transforms.ToTensor(), 
+        transforms.Normalize((0.485, 0.456, 0.406), 
+                             (0.229, 0.224, 0.225))])
+    
+    train_loader = get_loader(root_train, json_train, ids, vocab, transform, 1, False, 0)
+    for i, (images, captions, lengths) in enumerate(train_loader):
+        print("images shape:", images.shape)
+        print("captions: ", captions)
+        print("lengths: ", lengths)
+        break
