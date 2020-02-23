@@ -4,9 +4,9 @@ import torchvision.models as models
 from torch.nn.utils.rnn import pack_padded_sequence
 
 
-class CNN(nn.Module):
+class EncoderCNN(nn.Module):
     def __init__(self, embedding_size):
-        super(CNN, self).__init__()
+        super(EncoderCNN, self).__init__()
         resnet = models.resnet152(pretrained=True)
         modules = list(resnet.children())[:-1]
         self.resnet = nn.Sequential(*modules)
@@ -23,7 +23,7 @@ class CNN(nn.Module):
         return features
 
 
-class RNN(nn.Module):
+class DecoderRNN(nn.Module):
     def __init__(self, embedding_size):
         super(RNN, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_size)
