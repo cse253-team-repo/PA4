@@ -1,5 +1,6 @@
 import nltk
 # nltk.download('punkt')
+import json as js
 import pickle
 import argparse
 from collections import Counter
@@ -27,18 +28,23 @@ class Vocabulary(object):
     def __len__(self):
         return len(self.word2idx)
 
-def build_vocab(json, threshold):
+def build_vocab(json, threshold, subset_id):
     """Build a simple vocabulary wrapper."""
     coco = COCO(json)
     counter = Counter()
     ids = coco.anns.keys()
-    for i, id in enumerate(ids):
+    with open("data/annotations/ids_train.json", 'rb') as f:
+        subset_ids = js.load(f)['ids']
+    # print("ids: ", len(ids))
+    # print("subset ids: ", len(subset_ids))
+    for i, id in enumerate(subset_ids):
+        # print("id: ", id)
         caption = str(coco.anns[id]['caption'])
         tokens = nltk.tokenize.word_tokenize(caption.lower())
         counter.update(tokens)
 
         if (i+1) % 1000 == 0:
-            print("[{}/{}] Tokenized the captions.".format(i+1, len(ids)))
+            print("[{}/{}] Tokenized the captions.".format(i+1, len(subset_ids)))
 
     # If the word frequency is less than 'threshold', then the word is discarded.
     words = [word for word, cnt in counter.items() if cnt >= threshold]
@@ -56,7 +62,7 @@ def build_vocab(json, threshold):
     return vocab
 
 def main(args):
-    vocab = build_vocab(json=args.caption_path, threshold=args.threshold)
+    vocab = build_vocab(json=args.caption_path, threshold=args.threshold, subset_id=args.subset_id_path)
     vocab_path = args.vocab_path
     with open(vocab_path, 'wb') as f:
         pickle.dump(vocab, f)
@@ -67,6 +73,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--caption_path', type=str, default='data/annotations/captions_train2014.json', help='path for train annotation file')
+    parser.add_argument('--subset_id_path', type=str, default='data/annotations/ids_train.json.json', help='subset ids')
     parser.add_argument('--vocab_path', type=str, default='./data/vocab.pkl', help='path for saving vocabulary wrapper')
     parser.add_argument('--threshold', type=int, default=3, help='minimum word count threshold')
     args = parser.parse_args()

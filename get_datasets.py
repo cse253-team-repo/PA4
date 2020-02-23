@@ -24,9 +24,3 @@ testIds = [int(i) for i in testIds[0]]
 for img_id in testIds:
     path = cocoTest.loadImgs(img_id)[0]['file_name']
     copyfile('/datasets/COCO-2015/val2014/'+path, './data/images/test/'+path)
-
-
-
-# COCO_train2014_000000476736.jpg
-
-509365

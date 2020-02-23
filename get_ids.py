@@ -15,10 +15,7 @@ import pickle
 
 # with open("ids.pkl", 'wb') as f:
 #     pickle.dump(ids, f)
-with open("data/ids.pkl", 'rb') as f:
-    ids = pickle.load(f)
+# with open("data/ids.pkl", 'rb') as f:
+#     ids = pickle.load(f)
 
-print("ids; ", len(ids['train_ids']))
-
-
-509365
+# print("ids; ", len(ids['train_ids']))
