@@ -110,8 +110,8 @@ def get_loader(root, json, ids, vocab, transform, batch_size, shuffle, num_worke
 
 
 if __name__ == "__main__":
-    root_train = "/datasets/home/53/953/cs253wi20ai/PA4/data/images/train"
-    json_train = "/datasets/home/53/953/cs253wi20ai/PA4/data/annotations/captions_train2014.json"
+    root_train = "data/images/train"
+    json_train = "data/annotations/captions_train2014.json"
     
     with open("data/vocab.pkl", 'rb') as f:
         vocab = pickle.load(f)
