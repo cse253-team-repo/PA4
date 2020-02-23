@@ -3,9 +3,6 @@ import torch.nn as nn
 import torchvision.models as models
 from torch.nn.utils.rnn import pack_padded_sequence
 
-# TODO why split encode and decode ??????????
-# TODO unsqueeze, reshape -1
-
 
 class CNN(nn.Module):
     def __init__(self, embedding_size):
@@ -35,12 +32,16 @@ class RNN(nn.Module):
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_length = max_length
 
-    def forward(self, features, captions, lengths):
+    def forward(self, features, captions, lengths, states=None):
+        hiddens = []
         embeddings = self.embedding(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
-        hiddens, _ = self.lstm(packed)
-        outputs = self.linear(hiddens[0])
+        for i in range(packed.shape[1]):
+            hidden, states = self.lstm(packed[:, i], states)
+            hiddens.append(hidden)
+
+        outputs = self.linear(hiddens.squeeze(1))
         return outputs
 
     def sample(self, features, states=None):
@@ -55,5 +56,4 @@ class RNN(nn.Module):
             inputs = inputs.unsqueeze(1)
 
         sampled_ids = torch.stack(sampled_ids, 1)
-
         return sampled_ids
