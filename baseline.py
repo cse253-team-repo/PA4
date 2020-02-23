@@ -6,8 +6,13 @@ from torch.nn.utils.rnn import pack_padded_sequence
 
 class EncoderCNN(nn.Module):
     def __init__(self, embedding_size):
+<<<<<<< HEAD
         super(EncoderCNN, self).__init__()
         resnet = models.resnet152(pretrained=True)
+=======
+        super(CNN, self).__init__()
+        resnet = models.resnet50(pretrained=True)
+>>>>>>> 2b7c2a7e4b3163c30edf5295c10ec59d42bad695
         modules = list(resnet.children())[:-1]
         self.resnet = nn.Sequential(*modules)
         self.linear = nn.Linear(resnet.fc.in_features, embedding_size)
