@@ -116,9 +116,6 @@ if __name__ == "__main__":
     with open("data/vocab.pkl", 'rb') as f:
         vocab = pickle.load(f)
 
-    with open("data/ids.pkl", 'rb') as f:
-        ids = pickle.load(f)
-
     with open("data/annotations/ids_train.json", 'rb') as f:
         ids = js.load(f)['ids']
 
