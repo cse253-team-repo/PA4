@@ -10,7 +10,6 @@ from get_vocab import Vocabulary
 from pycocotools.coco import COCO
 import json as js
 
-
 class CocoDataset(data.Dataset):
     """COCO Custom Dataset compatible with torch.utils.data.DataLoader."""
     def __init__(self, root, json, ids, vocab, transform):
@@ -39,11 +38,9 @@ class CocoDataset(data.Dataset):
         path = coco.loadImgs(img_id)[0]['file_name']
 
         image = Image.open(os.path.join(self.root, path)).convert('RGB')
-        # print("raw image shape: ", type(image))
-        print("raw image shape: ", image.size)
         if min(image.size) < transform.transforms[0].size[0]:
             ratio = transform.transforms[0].size[0] / min(image.size)
-            new_size = tuple([int(x*ratio) for x in images.size])
+            new_size = tuple([int(x*ratio) for x in image.size])
             image = image.resize(new_size, Image.ANTIALIAS)
             pass
         if self.transform is not None:
@@ -125,7 +122,6 @@ if __name__ == "__main__":
     with open("data/annotations/ids_train.json", 'rb') as f:
         ids = js.load(f)['ids']
 
-    
     transform = transforms.Compose([ 
         transforms.RandomCrop(224),
         transforms.RandomHorizontalFlip(), 
@@ -133,7 +129,6 @@ if __name__ == "__main__":
         transforms.Normalize((0.485, 0.456, 0.406), 
                              (0.229, 0.224, 0.225))])
     
-    # .RandomCrop.size)
     train_loader = get_loader(root_train, json_train, ids, vocab, transform, 4, False, 1)
     for i, (images, captions, lengths) in enumerate(train_loader):
         print("images shape:", images.shape)
