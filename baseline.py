@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from torch.nn.utils.rnn import pack_padded_sequence
+from torch.utils.data import WeightedRandomSampler
 from torch.autograd import Variable
 import numpy as np
 
@@ -56,13 +57,20 @@ class DecoderRNN(nn.Module):
         outputs = self.linear(hiddens[0])
         return outputs
 
-    def sample(self, features, states=None):
+    def sample(self, features, states=None, stochastic=False):
         sampled_ids = []
         inputs = features.unsqueeze(1)
+
         for i in range(self.max_length):
             hiddens, states = self.lstm(inputs, states)
             outputs = self.linear(hiddens.squeeze(1))
-            _, predicted = outputs.max(1)
+
+            if stochastic == True:
+                predicted = WeightedRandomSampler(
+                    torch.nn.functional.softmax(outputs, dim=2), outputs.shape[2])
+            else:
+                _, predicted = outputs.max(1)
+
             sampled_ids.append(predicted)
             inputs = self.embedding(predicted)
             inputs = inputs.unsqueeze(1)
