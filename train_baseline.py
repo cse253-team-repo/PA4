@@ -35,7 +35,7 @@ def main(args):
     decoder = DecoderRNN(args.embedding_size, args.hidden_size,
                          len(vocab), args.num_layers).to(device)
 
-    criterion = nn.CrossEntropyoss()
+    criterion = nn.CrossEntropyLoss()
     params = list(encoder.parameter()) + \
         list(encoder.bn.parameter()) + list(decoder.parameter())
     optimizer = nn.optim.Adam(params, lr=args.learning_rate)
