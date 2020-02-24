@@ -40,16 +40,20 @@ class DecoderRNN(nn.Module):
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
         
-        for i in range(max(lengths)):
-        # for i in range(packed.shape[1]):
-            hidden, states = self.lstm(embeddings[:,i].unsqueeze(1), states)
-            print("hidden shape: ", hidden.shape)
-            hiddens.append(hidden)
+        inputs_iter = packed[0]
+        batch_size_iter = packed[1]
+        
+        # for i in range(max(lengths)):
+        # for i in range(len(packed)):
+        #     # hidden, states = self.lstm(embeddings[:,i].unsqueeze(1), states)
+        #     print("hidden shape: ", hidden.shape)
+        #     hiddens.append(hidden)
+        # hiddens = torch.cat(hiddens,dim=1)
+        # print("hiddens shape: ", hiddens.shape)
+        # hiddens = Variable(hiddens, requires_grad=True)
 
-        hiddens = torch.cat(hiddens,dim=1)
-        print("hiddens shape: ", hiddens.shape)
-        hiddens = Variable(hiddens, requires_grad=True)
-        outputs = self.linear(hiddens)
+        hiddens, _ = self.lstm(packed)
+        outputs = self.linear(hiddens[0])
         return outputs
 
     def sample(self, features, states=None):

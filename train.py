@@ -57,12 +57,11 @@ def main(args):
             # Set mini-batch dataset
             images = images.to(device)
             captions = captions.to(device)
-            # targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
-            targets = captions
+            targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
             # Forward, backward and optimize
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
-            loss = criterion(outputs.transpose(2,1), targets)
+            loss = criterion(outputs, targets)
             decoder.zero_grad()
             encoder.zero_grad()
             loss.backward()
