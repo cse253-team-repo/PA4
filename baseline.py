@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from torch.nn.utils.rnn import pack_padded_sequence
+from torch.autograd import Variable
+import numpy as np
 
 
 class EncoderCNN(nn.Module):
@@ -40,9 +42,12 @@ class DecoderRNN(nn.Module):
         
         for i in range(max(lengths)):
         # for i in range(packed.shape[1]):
-            hidden, states = self.lstm(packed[:, i], states)
+            hidden, states = self.lstm(embeddings[:,i].unsqueeze(0), states)
             hiddens.append(hidden)
-
+            
+        hiddens = torch.cat(hiddens,dim=0).transpose(dim0=1, dim1=0)
+        hiddens = Variable(hiddens, requires_grad=True)
+        print("hiddens shape: ", hiddens.shape)
         outputs = self.linear(hiddens.squeeze(1))
         return outputs
 
