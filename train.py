@@ -38,7 +38,7 @@ def main(args):
     # Build data loader
     data_loader = get_loader(args.image_dir, args.caption_path, ids, vocab, 
                              transform, args.batch_size,
-                             shuffle=True, num_workers=args.num_workers) 
+                             shuffle=False, num_workers=args.num_workers) 
 
     # Build the models
     encoder = EncoderCNN(args.embed_size).to(device)
@@ -83,7 +83,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', type=str, default='models/' , help='path for saving trained models')
-    parser.add_argument('--crop_size', type=int, default=100, help='size for randomly cropping images')
+    parser.add_argument('--crop_size', type=int, default=224, help='size for randomly cropping images')
     parser.add_argument('--ids_path', type=str, default='data/annotations/ids_train.json', help='path for ids')
     parser.add_argument('--vocab_path', type=str, default='data/vocab.pkl', help='path for vocabulary wrapper')
     parser.add_argument('--image_dir', type=str, default='data/images/train', help='directory for resized images')

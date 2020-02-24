@@ -21,6 +21,8 @@ def main(args):
 
     # TODO how to transform image??????????
     transform = transforms.Compose([
+        transforms.RandomCrop(args.crop_size),
+        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406),
                              (0.229, 0.224, 0.225))])
@@ -49,11 +51,10 @@ def main(args):
         for i, (images, captions, lengths) in enumerate(data_loader):
             images = images.to(device)
             captions = captions.to(device)
-            targets = pack_padded_sequence(
-                captions, lengths, batch_first=True)[0]
-
+            targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
+            
             features = encoder(images)
-            outputs = decoder(features)
+            outputs = decoder(features,captions,lengths)
             loss = criterion(outputs, targets)
             encoder.zero_grad()
             decoder.zero_grad()

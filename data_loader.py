@@ -39,10 +39,12 @@ class CocoDataset(data.Dataset):
 
         image = Image.open(os.path.join(self.root, path)).convert('RGB')
         if min(image.size) < self.transform.transforms[0].size[0]:
-            ratio = self.transform.transforms[0].size[0] / min(image.size)
-            new_size = tuple([int(x*ratio) for x in image.size])
+            # ratio = self.transform.transforms[0].size[0] / min(image.size)
+            # new_size = tuple([int(x*ratio) for x in image.size])
+            # new_size = (int(min(image.size)*ratio),int(min(image.size)*ratio))
+            new_size = (256,256)
             image = image.resize(new_size, Image.ANTIALIAS)
-            pass
+
         if self.transform is not None:
             image = self.transform(image)
 
