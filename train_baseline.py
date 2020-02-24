@@ -4,6 +4,7 @@ import torch.nn as nn
 import numpy as np
 import os
 import pickle
+import json as js
 from data_loader import get_loader
 from get_vocab import Vocabulary
 from baseline import EncoderCNN, DecoderRNN
@@ -27,7 +28,10 @@ def main(args):
     with open(args.vocab_path, 'rb') as f:
         vocab = pickle.load(f)
 
-    data_loader = get_loader(args.image_dir, args.caption_path, args.ids_path, vocab,
+    with open(args.ids_path, 'rb') as f:
+        ids = js.load(f)['ids']
+
+    data_loader = get_loader(args.image_dir, args.caption_path, ids, vocab,
                              transform, args.batch_size,
                              shuffle=False, num_workers=args.num_workers)
 
