@@ -37,7 +37,9 @@ class DecoderRNN(nn.Module):
         embeddings = self.embedding(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
-        for i in range(packed.shape[1]):
+        
+        for i in range(max(lengths)):
+        # for i in range(packed.shape[1]):
             hidden, states = self.lstm(packed[:, i], states)
             hiddens.append(hidden)
 

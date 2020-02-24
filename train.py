@@ -22,7 +22,7 @@ def main(args):
     
     # Image preprocessing, normalization for the pretrained resnet
     transform = transforms.Compose([ 
-        # transforms.RandomCrop(args.crop_size),
+        transforms.RandomCrop(args.crop_size),
         transforms.RandomHorizontalFlip(), 
         transforms.ToTensor(), 
         transforms.Normalize((0.485, 0.456, 0.406), 
@@ -58,9 +58,6 @@ def main(args):
             images = images.to(device)
             captions = captions.to(device)
             targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
-            print("images shape:", images.shape)
-            print("captions: ", captions)
-            print("lengths: ", lengths)
             # Forward, backward and optimize
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
@@ -86,7 +83,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', type=str, default='models/' , help='path for saving trained models')
-    parser.add_argument('--crop_size', type=int, default=224 , help='size for randomly cropping images')
+    parser.add_argument('--crop_size', type=int, default=100, help='size for randomly cropping images')
     parser.add_argument('--ids_path', type=str, default='data/annotations/ids_train.json', help='path for ids')
     parser.add_argument('--vocab_path', type=str, default='data/vocab.pkl', help='path for vocabulary wrapper')
     parser.add_argument('--image_dir', type=str, default='data/images/train', help='directory for resized images')

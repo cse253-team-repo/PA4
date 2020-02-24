@@ -39,6 +39,13 @@ class CocoDataset(data.Dataset):
         path = coco.loadImgs(img_id)[0]['file_name']
 
         image = Image.open(os.path.join(self.root, path)).convert('RGB')
+        # print("raw image shape: ", type(image))
+        print("raw image shape: ", image.size)
+        if min(image.size) < transform.transforms[0].size[0]:
+            ratio = transform.transforms[0].size[0] / min(image.size)
+            new_size = tuple([int(x*ratio) for x in images.size])
+            image = image.resize(new_size, Image.ANTIALIAS)
+            pass
         if self.transform is not None:
             image = self.transform(image)
 
@@ -120,15 +127,16 @@ if __name__ == "__main__":
 
     
     transform = transforms.Compose([ 
-        # transforms.RandomCrop(224),
+        transforms.RandomCrop(224),
         transforms.RandomHorizontalFlip(), 
         transforms.ToTensor(), 
         transforms.Normalize((0.485, 0.456, 0.406), 
                              (0.229, 0.224, 0.225))])
     
-    train_loader = get_loader(root_train, json_train, ids, vocab, transform, 2, False, 1)
+    # .RandomCrop.size)
+    train_loader = get_loader(root_train, json_train, ids, vocab, transform, 4, False, 1)
     for i, (images, captions, lengths) in enumerate(train_loader):
         print("images shape:", images.shape)
-        print("captions: ", captions)
-        print("lengths: ", lengths)
+        # print("captions: ", captions)
+        # print("lengths: ", lengths)
         break
