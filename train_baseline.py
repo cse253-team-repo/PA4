@@ -53,7 +53,7 @@ def main(args):
                 captions, lengths, batch_first=True)[0]
 
             features = encoder(images)
-            outputs = decoder(features)
+            outputs = decoder(features, captions, lengths)
             loss = criterion(outputs, targets)
             encoder.zero_grad()
             decoder.zero_grad()
