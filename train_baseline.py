@@ -36,8 +36,8 @@ def main(args):
                          len(vocab), args.num_layers).to(device)
 
     criterion = nn.CrossEntropyLoss()
-    params = list(encoder.parameter()) + \
-        list(encoder.bn.parameter()) + list(decoder.parameter())
+    params = list(encoder.parameters()) + \
+        list(encoder.bn.parameters()) + list(decoder.parameters())
     optimizer = nn.optim.Adam(params, lr=args.learning_rate)
 
     total_step = len(data_loader)
