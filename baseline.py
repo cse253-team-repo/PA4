@@ -30,7 +30,7 @@ class DecoderRNN(nn.Module):
         self.lstm = nn.LSTM(embedding_size, hidden_size,
                             num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
-        self.max_length = max_length
+        self.max_length = 10  # max_length
 
     def forward(self, features, captions, lengths, states=None):
         hiddens = []
