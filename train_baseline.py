@@ -38,7 +38,7 @@ def main(args):
     criterion = nn.CrossEntropyLoss()
     params = list(encoder.parameters()) + \
         list(encoder.bn.parameters()) + list(decoder.parameters())
-    optimizer = nn.optim.Adam(params, lr=args.learning_rate)
+    optimizer = torch.optim.Adam(params, lr=args.learning_rate)
 
     total_step = len(data_loader)
     for epoch in range(args.num_epochs):
