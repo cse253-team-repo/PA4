@@ -33,7 +33,6 @@ class CocoDataset(data.Dataset):
         coco = self.coco
         vocab = self.vocab
         ann_id = self.ids[index]
-        # print("ann id: ", ann_id)
         caption = coco.anns[ann_id]['caption']
         # print("caption: ", caption)
         img_id = coco.anns[ann_id]['image_id']
@@ -127,7 +126,7 @@ if __name__ == "__main__":
         transforms.Normalize((0.485, 0.456, 0.406), 
                              (0.229, 0.224, 0.225))])
     
-    train_loader = get_loader(root_train, json_train, ids, vocab, transform, 2, False, 0)
+    train_loader = get_loader(root_train, json_train, ids, vocab, transform, 2, False, 1)
     for i, (images, captions, lengths) in enumerate(train_loader):
         print("images shape:", images.shape)
         print("captions: ", captions)

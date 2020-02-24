@@ -9,6 +9,7 @@ from get_vocab import Vocabulary
 from baseline import EncoderCNN, DecoderRNN
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
+import json as js
 
 
 # Device configuration
@@ -21,7 +22,7 @@ def main(args):
     
     # Image preprocessing, normalization for the pretrained resnet
     transform = transforms.Compose([ 
-        transforms.RandomCrop(args.crop_size),
+        # transforms.RandomCrop(args.crop_size),
         transforms.RandomHorizontalFlip(), 
         transforms.ToTensor(), 
         transforms.Normalize((0.485, 0.456, 0.406), 
@@ -31,8 +32,11 @@ def main(args):
     with open(args.vocab_path, 'rb') as f:
         vocab = pickle.load(f)
     
+    with open(args.ids_path, 'rb') as f:
+        ids = js.load(f)['ids']
+    
     # Build data loader
-    data_loader = get_loader(args.image_dir, args.caption_path, args.ids_path ,vocab, 
+    data_loader = get_loader(args.image_dir, args.caption_path, ids, vocab, 
                              transform, args.batch_size,
                              shuffle=True, num_workers=args.num_workers) 
 
@@ -54,7 +58,9 @@ def main(args):
             images = images.to(device)
             captions = captions.to(device)
             targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
-            
+            print("images shape:", images.shape)
+            print("captions: ", captions)
+            print("lengths: ", lengths)
             # Forward, backward and optimize
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
