@@ -24,7 +24,7 @@ class EncoderCNN(nn.Module):
 
 
 class DecoderRNN(nn.Module):
-    def __init__(self, embedding_size):
+    def __init__(self, embedding_size, hidden_size, vocab_size, num_layers):
         super(DecoderRNN, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_size)
         self.lstm = nn.LSTM(embedding_size, hidden_size,
