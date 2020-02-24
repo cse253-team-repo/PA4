@@ -42,13 +42,14 @@ class DecoderRNN(nn.Module):
         
         for i in range(max(lengths)):
         # for i in range(packed.shape[1]):
-            hidden, states = self.lstm(embeddings[:,i].unsqueeze(0), states)
+            hidden, states = self.lstm(embeddings[:,i].unsqueeze(1), states)
+            print("hidden shape: ", hidden.shape)
             hiddens.append(hidden)
-            
-        hiddens = torch.cat(hiddens,dim=0).transpose(dim0=1, dim1=0)
-        hiddens = Variable(hiddens, requires_grad=True)
+
+        hiddens = torch.cat(hiddens,dim=1)
         print("hiddens shape: ", hiddens.shape)
-        outputs = self.linear(hiddens.squeeze(1))
+        hiddens = Variable(hiddens, requires_grad=True)
+        outputs = self.linear(hiddens)
         return outputs
 
     def sample(self, features, states=None):
