@@ -38,8 +38,8 @@ class CocoDataset(data.Dataset):
         path = coco.loadImgs(img_id)[0]['file_name']
 
         image = Image.open(os.path.join(self.root, path)).convert('RGB')
-        if min(image.size) < transform.transforms[0].size[0]:
-            ratio = transform.transforms[0].size[0] / min(image.size)
+        if min(image.size) < self.transform.transforms[0].size[0]:
+            ratio = self.transform.transforms[0].size[0] / min(image.size)
             new_size = tuple([int(x*ratio) for x in image.size])
             image = image.resize(new_size, Image.ANTIALIAS)
             pass
