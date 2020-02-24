@@ -29,7 +29,7 @@ def main(args):
 
     data_loader = get_loader(args.image_dir, args.caption_path, args.ids_path, vocab,
                              transform, args.batch_size,
-                             shuffle=True, num_workers=args.num_workers)
+                             shuffle=False, num_workers=args.num_workers)
 
     encoder = EncoderCNN(args.embedding_size).to(device)
     decoder = DecoderRNN(args.embedding_size, args.hidden_size,
