@@ -51,14 +51,11 @@ def main(args):
         for i, (images, captions, lengths) in enumerate(data_loader):
             images = images.to(device)
             captions = captions.to(device)
-            targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
-            
+            targets = pack_padded_sequence(
+                captions, lengths, batch_first=True)[0]
+
             features = encoder(images)
-<<<<<<< HEAD
-            outputs = decoder(features,captions,lengths)
-=======
             outputs = decoder(features, captions, lengths)
->>>>>>> 645f4ffe12fff11d38bf17414b2f10e9bd2e0e31
             loss = criterion(outputs, targets)
             encoder.zero_grad()
             decoder.zero_grad()
