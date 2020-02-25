@@ -26,9 +26,9 @@ class EncoderCNN(nn.Module):
         return features
 
 
-class DecoderRNN(nn.Module):
+class DecoderLSTM(nn.Module):
     def __init__(self, embedding_size, hidden_size, vocab_size, num_layers):
-        super(DecoderRNN, self).__init__()
+        super(DecoderLSTM, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_size)
         self.lstm = nn.LSTM(embedding_size, hidden_size,
                             num_layers, batch_first=True)
@@ -40,10 +40,10 @@ class DecoderRNN(nn.Module):
         embeddings = self.embedding(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
-        
+
         inputs_iter = packed[0]
         batch_size_iter = packed[1]
-        
+
         # for i in range(max(lengths)):
         # for i in range(len(packed)):
         #     # hidden, states = self.lstm(embeddings[:,i].unsqueeze(1), states)
@@ -63,6 +63,50 @@ class DecoderRNN(nn.Module):
 
         for i in range(self.max_length):
             hiddens, states = self.lstm(inputs, states)
+            outputs = self.linear(hiddens.squeeze(1))
+
+            if stochastic == True:
+                predicted = WeightedRandomSampler(
+                    torch.nn.functional.softmax(outputs, dim=2), outputs.shape[2])
+            else:
+                _, predicted = outputs.max(1)
+
+            sampled_ids.append(predicted)
+            inputs = self.embedding(predicted)
+            inputs = inputs.unsqueeze(1)
+
+        sampled_ids = torch.stack(sampled_ids, 1)
+        return sampled_ids
+
+
+class DecoderRNN(nn.Module):
+    def __init__(self, embedding_size, hidden_size, vocab_size, num_layers):
+        super(DecoderRNN, self).__init__()
+        self.embedding = nn.Embedding(vocab_size, embedding_size)
+        self.rnn = nn.RNN(embedding_size, hidden_size,
+                          num_layers, batch_first=True)
+        self.linear = nn.Linear(hidden_size, vocab_size)
+        self.max_length = 10  # max_length
+
+    def forward(self, features, captions, lengths, states=None):
+        hiddens = []
+        embeddings = self.embedding(captions)
+        embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
+        packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
+
+        inputs_iter = packed[0]
+        batch_size_iter = packed[1]
+
+        hiddens, _ = self.rnn(packed)
+        outputs = self.linear(hiddens[0])
+        return outputs
+
+    def sample(self, features, states=None, stochastic=False):
+        sampled_ids = []
+        inputs = features.unsqueeze(1)
+
+        for i in range(self.max_length):
+            hiddens, states = self.rnn(inputs, states)
             outputs = self.linear(hiddens.squeeze(1))
 
             if stochastic == True:

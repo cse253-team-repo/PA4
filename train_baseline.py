@@ -7,7 +7,7 @@ import pickle
 import json as js
 from data_loader import get_loader
 from get_vocab import Vocabulary
-from baseline import EncoderCNN, DecoderRNN
+from baseline import EncoderCNN, DecoderLSTM
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
 
@@ -38,8 +38,8 @@ def main(args):
                              shuffle=False, num_workers=args.num_workers)
 
     encoder = EncoderCNN(args.embedding_size).to(device)
-    decoder = DecoderRNN(args.embedding_size, args.hidden_size,
-                         len(vocab), args.num_layers).to(device)
+    decoder = DecoderLSTM(args.embedding_size, args.hidden_size,
+                          len(vocab), args.num_layers).to(device)
 
     criterion = nn.CrossEntropyLoss()
     params = list(encoder.parameters()) + \
