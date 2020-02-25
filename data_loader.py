@@ -138,6 +138,6 @@ if __name__ == "__main__":
                               ids, vocab, transform, 4, False, 1)
     for i, (images, captions, lengths) in enumerate(train_loader):
         print("images shape:", images.shape)
-        print("captions: ", captions.shape)
-        print("lengths: ", lengths.shape)
+        print("captions: ", captions)
+        print("lengths: ", lengths)
         break
