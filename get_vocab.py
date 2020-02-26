@@ -76,7 +76,9 @@ def main(args):
     vocab_path = args.vocab_path.join('vocab.pkl')
     w2v_path = args.vocab_path.join('word2vec.model')
 
-    w2v.save(w2v_path)
+    # w2v.save(w2v_path)
+    with open(w2v_path, 'wb') as f:
+        pickle.dump(w2v, f)
     with open(vocab_path, 'wb') as f:
         pickle.dump(vocab, f)
     print("Total vocabulary size: {}".format(len(vocab)))
