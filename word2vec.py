@@ -1,4 +1,5 @@
 import pickle
+from get_vocab import Vocabulary
 
 
 vocab_path = './data/vocab.pkl'
