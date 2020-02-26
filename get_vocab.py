@@ -75,8 +75,8 @@ def main(args):
                              subset_id=args.subset_id_path, embedding_size=args.embedding_size)
 
     w2v_path = args.w2v_path
-    vocab_path = args.vocab_path
-    w2v.save("word2vec.model")
+    vocab_path = args.vocab_path + 'w2v_' + str(args.embedding_size) + '.model'
+    w2v.save(w2v_path)
     with open(vocab_path, 'wb') as f:
         pickle.dump(vocab, f)
 
@@ -92,7 +92,7 @@ if __name__ == '__main__':
                         default='data/annotations/ids_train.json.json', help='subset ids')
     parser.add_argument('--vocab_path', type=str, default='./data/vocab.pkl',
                         help='path for saving vocabulary wrapper')
-    parser.add_argument('--w2v_path', type=str, default='./data/w2v.model',
+    parser.add_argument('--w2v_path', type=str, default='./data/',
                         help='path for saving word2vec model')
     parser.add_argument('--threshold', type=int, default=3,
                         help='minimum word count threshold')
