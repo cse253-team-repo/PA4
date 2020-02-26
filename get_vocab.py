@@ -73,14 +73,13 @@ def build_vocab(json, threshold, subset_id, embedding_size):
 def main(args):
     vocab, w2v = build_vocab(json=args.caption_path, threshold=args.threshold,
                              subset_id=args.subset_id_path, embedding_size=args.embedding_size)
-    vocab_path = args.vocab_path.join('vocab.pkl')
-    w2v_path = args.vocab_path.join('word2vec.model')
 
-    # w2v.save(w2v_path)
-    with open(w2v_path, 'wb') as f:
-        pickle.dump(w2v, f)
+    w2v_path = args.w2v_path
+    vocab_path = args.vocab_path
+    w2v.save("word2vec.model")
     with open(vocab_path, 'wb') as f:
         pickle.dump(vocab, f)
+
     print("Total vocabulary size: {}".format(len(vocab)))
     print("Saved the vocabulary wrapper to '{}'".format(vocab_path))
 
@@ -91,8 +90,10 @@ if __name__ == '__main__':
                         default='data/annotations/captions_train2014.json', help='path for train annotation file')
     parser.add_argument('--subset_id_path', type=str,
                         default='data/annotations/ids_train.json.json', help='subset ids')
-    parser.add_argument('--vocab_path', type=str, default='./data/',
+    parser.add_argument('--vocab_path', type=str, default='./data/vocab.pkl',
                         help='path for saving vocabulary wrapper')
+    parser.add_argument('--w2v_path', type=str, default='./data/w2v.model',
+                        help='path for saving word2vec model')
     parser.add_argument('--threshold', type=int, default=3,
                         help='minimum word count threshold')
     parser.add_argument('--embedding_size', type=int, default=100,
