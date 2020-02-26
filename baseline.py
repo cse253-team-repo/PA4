@@ -4,6 +4,7 @@ import torchvision.models as models
 from torch.nn.utils.rnn import pack_padded_sequence
 from torch.utils.data import WeightedRandomSampler
 from torch.autograd import Variable
+from gensim.models import Word2Vec
 import numpy as np
 
 
@@ -27,9 +28,14 @@ class EncoderCNN(nn.Module):
 
 
 class DecoderLSTM(nn.Module):
-    def __init__(self, embedding_size, hidden_size, vocab_size, num_layers):
+    def __init__(self, embedding_size, hidden_size, vocab_size, num_layers, use_word2vec=False):
         super(DecoderLSTM, self).__init__()
-        self.embedding = nn.Embedding(vocab_size, embedding_size)
+
+        if use_word2vec == False:
+            raise NotImplementedError
+        else:
+            self.embedding = nn.Embedding(vocab_size, embedding_size)
+
         self.lstm = nn.LSTM(embedding_size, hidden_size,
                             num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
@@ -80,9 +86,14 @@ class DecoderLSTM(nn.Module):
 
 
 class DecoderRNN(nn.Module):
-    def __init__(self, embedding_size, hidden_size, vocab_size, num_layers):
+    def __init__(self, embedding_size, hidden_size, vocab_size, num_layers, use_word2vec=False):
         super(DecoderRNN, self).__init__()
-        self.embedding = nn.Embedding(vocab_size, embedding_size)
+
+        if use_word2vec == False:
+            raise NotImplementedError
+        else:
+            self.embedding = nn.Embedding(vocab_size, embedding_size)
+
         self.rnn = nn.RNN(embedding_size, hidden_size,
                           num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)

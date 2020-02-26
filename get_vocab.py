@@ -9,6 +9,7 @@ from pycocotools.coco import COCO
 
 class Vocabulary(object):
     """Simple vocabulary wrapper."""
+
     def __init__(self):
         self.word2idx = {}
         self.idx2word = {}
@@ -27,6 +28,7 @@ class Vocabulary(object):
 
     def __len__(self):
         return len(self.word2idx)
+
 
 def build_vocab(json, threshold, subset_id):
     """Build a simple vocabulary wrapper."""
@@ -61,8 +63,10 @@ def build_vocab(json, threshold, subset_id):
         vocab.add_word(word)
     return vocab
 
+
 def main(args):
-    vocab = build_vocab(json=args.caption_path, threshold=args.threshold, subset_id=args.subset_id_path)
+    vocab = build_vocab(json=args.caption_path,
+                        threshold=args.threshold, subset_id=args.subset_id_path)
     vocab_path = args.vocab_path
     with open(vocab_path, 'wb') as f:
         pickle.dump(vocab, f)
@@ -72,9 +76,13 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--caption_path', type=str, default='data/annotations/captions_train2014.json', help='path for train annotation file')
-    parser.add_argument('--subset_id_path', type=str, default='data/annotations/ids_train.json.json', help='subset ids')
-    parser.add_argument('--vocab_path', type=str, default='./data/vocab.pkl', help='path for saving vocabulary wrapper')
-    parser.add_argument('--threshold', type=int, default=3, help='minimum word count threshold')
+    parser.add_argument('--caption_path', type=str,
+                        default='data/annotations/captions_train2014.json', help='path for train annotation file')
+    parser.add_argument('--subset_id_path', type=str,
+                        default='data/annotations/ids_train.json.json', help='subset ids')
+    parser.add_argument('--vocab_path', type=str, default='./data/vocab.pkl',
+                        help='path for saving vocabulary wrapper')
+    parser.add_argument('--threshold', type=int, default=3,
+                        help='minimum word count threshold')
     args = parser.parse_args()
     main(args)
