@@ -5,6 +5,7 @@ import pickle
 import argparse
 from collections import Counter
 from pycocotools.coco import COCO
+from gensim.models import Word2Vec
 
 
 class Vocabulary(object):
@@ -30,11 +31,12 @@ class Vocabulary(object):
         return len(self.word2idx)
 
 
-def build_vocab(json, threshold, subset_id):
-    """Build a simple vocabulary wrapper."""
+def build_vocab(json, threshold, subset_id, embedding_size):
+    """Build a simple vocabulary wrapper and word2vec model."""
     coco = COCO(json)
     counter = Counter()
     ids = coco.anns.keys()
+    sentences = []
     with open("data/annotations/ids_train.json", 'rb') as f:
         subset_ids = js.load(f)['ids']
     # print("ids: ", len(ids))
@@ -42,6 +44,7 @@ def build_vocab(json, threshold, subset_id):
     for i, id in enumerate(subset_ids):
         # print("id: ", id)
         caption = str(coco.anns[id]['caption'])
+        sentences.append(caption.lower().split())
         tokens = nltk.tokenize.word_tokenize(caption.lower())
         counter.update(tokens)
 
@@ -58,16 +61,22 @@ def build_vocab(json, threshold, subset_id):
     vocab.add_word('<end>')
     vocab.add_word('<unk>')
 
+    # create word2vec model
+    w2v = Word2Vec(sentences, min_count=1, size=embedding_size, window=5)
+
     # Add the words to the vocabulary.
     for i, word in enumerate(words):
         vocab.add_word(word)
-    return vocab
+    return vocab, w2v
 
 
 def main(args):
-    vocab = build_vocab(json=args.caption_path,
-                        threshold=args.threshold, subset_id=args.subset_id_path)
-    vocab_path = args.vocab_path
+    vocab, w2v = build_vocab(json=args.caption_path, threshold=args.threshold,
+                             subset_id=args.subset_id_path, embedding_size=args.embedding_size)
+    vocab_path = args.vocab_path.join('vocab.pkl')
+    w2v_path = args.vocab_path.join('word2vec.model')
+
+    w2v.save(w2v_path)
     with open(vocab_path, 'wb') as f:
         pickle.dump(vocab, f)
     print("Total vocabulary size: {}".format(len(vocab)))
@@ -80,9 +89,11 @@ if __name__ == '__main__':
                         default='data/annotations/captions_train2014.json', help='path for train annotation file')
     parser.add_argument('--subset_id_path', type=str,
                         default='data/annotations/ids_train.json.json', help='subset ids')
-    parser.add_argument('--vocab_path', type=str, default='./data/vocab.pkl',
+    parser.add_argument('--vocab_path', type=str, default='./data/',
                         help='path for saving vocabulary wrapper')
     parser.add_argument('--threshold', type=int, default=3,
+                        help='minimum word count threshold')
+    parser.add_argument('--embedding_size', type=int, default=100,
                         help='minimum word count threshold')
     args = parser.parse_args()
     main(args)
