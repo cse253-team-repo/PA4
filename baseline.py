@@ -36,6 +36,8 @@ class DecoderLSTM(nn.Module):
                 w2v = Word2Vec.load(
                     './data/w2v_' + str(embedding_size) + '.model')
                 self.embedding = nn.Embedding.from_pretrained(w2v.wv)
+                for param in self.embedding.parameters():
+                    param.requires_grad = False
             except:
                 raise NotImplementedError
         else:
@@ -99,6 +101,8 @@ class DecoderRNN(nn.Module):
                 w2v = Word2Vec.load(
                     './data/w2v_' + str(embedding_size) + '.model')
                 self.embedding = nn.Embedding.from_pretrained(w2v.wv)
+                for param in self.embedding.parameters():
+                    param.requires_grad = False
             except:
                 raise NotImplementedError
         else:
