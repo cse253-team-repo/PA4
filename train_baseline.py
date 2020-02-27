@@ -93,7 +93,7 @@ if __name__ == '__main__':
                         help='step size for saving trained models')
 
     # Model parameters
-    parser.add_argument('--embedding_size', type=int, default=256,
+    parser.add_argument('--embedding_size', type=int, default=1000,
                         help='dimension of word embedding vectors')
     parser.add_argument('--hidden_size', type=int, default=512,
                         help='dimension of lstm hidden states')

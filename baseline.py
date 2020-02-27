@@ -35,9 +35,9 @@ class DecoderLSTM(nn.Module):
             try:
                 w2v = Word2Vec.load(
                     './data/w2v_' + str(embedding_size) + '.model')
+                self.embedding = nn.Embedding.from_pretrained(w2v.wv)
             except:
                 raise NotImplementedError
-            self.embedding = nn.Embedding.from_pretrained(w2v.wv)
         else:
             self.embedding = nn.Embedding(vocab_size, embedding_size)
 
@@ -98,9 +98,9 @@ class DecoderRNN(nn.Module):
             try:
                 w2v = Word2Vec.load(
                     './data/w2v_' + str(embedding_size) + '.model')
+                self.embedding = nn.Embedding.from_pretrained(w2v.wv)
             except:
                 raise NotImplementedError
-            self.embedding = nn.Embedding.from_pretrained(w2v.wv)
         else:
             self.embedding = nn.Embedding(vocab_size, embedding_size)
 

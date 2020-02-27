@@ -44,7 +44,7 @@ def main(args):
     # Build the models
     encoder = EncoderCNN(args.embed_size).to(device)
     decoder = DecoderRNN(args.embed_size, args.hidden_size,
-                         len(vocab), args.num_layers).to(device)
+                         len(vocab), args.num_layers, use_word2vec=True).to(device)
 
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
@@ -103,7 +103,7 @@ if __name__ == '__main__':
                         help='step size for saving trained models')
 
     # Model parameters
-    parser.add_argument('--embed_size', type=int, default=256,
+    parser.add_argument('--embed_size', type=int, default=1000,
                         help='dimension of word embedding vectors')
     parser.add_argument('--hidden_size', type=int, default=512,
                         help='dimension of lstm hidden states')
