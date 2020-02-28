@@ -31,7 +31,7 @@ class DecoderLSTM(nn.Module):
     def __init__(self, embedding_size, hidden_size, vocab_size, num_layers, use_word2vec=False):
         super(DecoderLSTM, self).__init__()
 
-        if use_word2vec == False:
+        if use_word2vec == True:
             try:
                 w2v = Word2Vec.load(
                     './data/w2v_' + str(embedding_size) + '.model')
@@ -96,7 +96,7 @@ class DecoderRNN(nn.Module):
     def __init__(self, embedding_size, hidden_size, vocab_size, num_layers, use_word2vec=False):
         super(DecoderRNN, self).__init__()
 
-        if use_word2vec == False:
+        if use_word2vec == True:
             try:
                 w2v = Word2Vec.load(
                     './data/w2v_' + str(embedding_size) + '.model')
