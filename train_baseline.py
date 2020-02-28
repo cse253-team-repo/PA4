@@ -15,6 +15,23 @@ from torchvision import transforms
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
+def valid_loss(encoder, decoder, valid_loader):
+    criterion = nn.CrossEntropyLoss()
+    losses = []
+    with torch.no_grad():
+        for i, (images, captions, lengths) in enumerate(valid_loader):
+            images = images.to(device)
+            captions = captions.to(device)
+            targets = pack_padded_sequence(
+                captions, lengths, batch_first=True)[0]
+            features = encoder(images)
+            outputs = decoder(features, captions, lengths)
+            loss = criterion(outputs, targets)
+            losses.append(loss.item())
+
+    return np.mean(losses)
+
+
 def main(args):
     if not os.path.exists(args.model_path):
         os.mkdir(args.model_path)
@@ -31,11 +48,15 @@ def main(args):
         vocab = pickle.load(f)
 
     with open(args.ids_path, 'rb') as f:
-        ids = js.load(f)['ids']
+        train_ids = js.load(f)['ids']
 
-    data_loader = get_loader(args.image_dir, args.caption_path, ids, vocab,
-                             transform, args.batch_size,
-                             shuffle=False, num_workers=args.num_workers)
+    with open(args.valid_ids_path, 'rb') as f:
+        valid_ids = js.load(f)['ids']
+
+    data_loader = get_loader(args.image_dir, args.caption_path, train_ids, vocab,
+                             transform, args.batch_size, shuffle=False, num_workers=args.num_workers)
+    valid_loader = get_loader(args.valid_image_dir, args.valid_caption_path, valid_ids,
+                              vocab, transform, args.batch_size, shuffle=False, num_workers=args.num_workers)
 
     encoder = EncoderCNN(args.embedding_size).to(device)
     decoder = DecoderLSTM(args.embedding_size, args.hidden_size,
@@ -47,7 +68,11 @@ def main(args):
     optimizer = torch.optim.Adam(params, lr=args.learning_rate)
 
     total_step = len(data_loader)
+    training_losses = []
+    valid_losses = []
     for epoch in range(args.num_epochs):
+        training_losses_epoch = []
+
         for i, (images, captions, lengths) in enumerate(data_loader):
             images = images.to(device)
             captions = captions.to(device)
@@ -62,9 +87,18 @@ def main(args):
             loss.backward()
             optimizer.step()
 
+            training_losses_epoch.append(loss.item())
+
             if i % args.log_step == 0:
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                       .format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item())))
+
+        training_loss = np.mean(training_losses_epoch)
+        training_losses.append(training_loss)
+        valid_loss = valid_loss(encoder, decoder, valid_loader)
+        valid_losses.append(valid_loss)
+        print('Epoch {}: Training Loss = {:.4f}, Validation Loss = {:.4f}'.format(
+            epoch, training_loss, valid_loss))
 
         # Save the model checkpoints
         torch.save(decoder.state_dict(), os.path.join(
@@ -87,6 +121,12 @@ if __name__ == '__main__':
                         default='data/images/train', help='directory for resized images')
     parser.add_argument('--caption_path', type=str, default='data/annotations/captions_train2014.json',
                         help='path for train annotation json file')
+    parser.add_argument('--valid_ids_path', type=str,
+                        default='data/annotations/ids_val.json', help='path for validation ids')
+    parser.add_argument('--valid_image_dir', type=str,
+                        default='data/images/test', help='directory for validation images')
+    parser.add_argument('--valid_caption_path', type=str, default='data/annotations/captions_val2014.json',
+                        help='path for validation annotation json file')
     parser.add_argument('--log_step', type=int, default=10,
                         help='step size for prining log info')
     parser.add_argument('--save_step', type=int, default=1000,
