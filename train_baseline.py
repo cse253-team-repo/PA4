@@ -15,7 +15,7 @@ from torchvision import transforms
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def valid_loss(encoder, decoder, valid_loader):
+def compute_valid_loss(encoder, decoder, valid_loader):
     criterion = nn.CrossEntropyLoss()
     losses = []
     with torch.no_grad():
@@ -90,12 +90,13 @@ def main(args):
             training_losses_epoch.append(loss.item())
 
             if i % args.log_step == 0:
+                break
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                       .format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item())))
 
         training_loss = np.mean(training_losses_epoch)
         training_losses.append(training_loss)
-        valid_loss = valid_loss(encoder, decoder, valid_loader)
+        valid_loss = compute_valid_loss(encoder, decoder, valid_loader)
         valid_losses.append(valid_loss)
         print('Epoch {}: Training Loss = {:.4f}, Validation Loss = {:.4f}'.format(
             epoch, training_loss, valid_loss))
@@ -127,7 +128,7 @@ if __name__ == '__main__':
                         default='data/images/test', help='directory for validation images')
     parser.add_argument('--valid_caption_path', type=str, default='data/annotations/captions_val2014.json',
                         help='path for validation annotation json file')
-    parser.add_argument('--log_step', type=int, default=10,
+    parser.add_argument('--log_step', type=int, default=100,
                         help='step size for prining log info')
     parser.add_argument('--save_step', type=int, default=1000,
                         help='step size for saving trained models')
