@@ -36,7 +36,6 @@ def main(args):
     if not os.path.exists(args.model_path):
         os.mkdir(args.model_path)
 
-    # TODO how to transform image??????????
     transform = transforms.Compose([
         transforms.RandomCrop(args.crop_size),
         transforms.RandomHorizontalFlip(),
@@ -101,11 +100,20 @@ def main(args):
         print('Epoch {}: Training Loss = {:.4f}, Validation Loss = {:.4f}'.format(
             epoch, training_loss, valid_loss))
 
-        # Save the model checkpoints
-        torch.save(decoder.state_dict(), os.path.join(
-            args.model_path, 'decoder-{}-{}.ckpt'.format(epoch+1, i+1)))
-        torch.save(encoder.state_dict(), os.path.join(
-            args.model_path, 'encoder-{}-{}.ckpt'.format(epoch+1, i+1)))
+        # Save the best model
+        if valid_loss <= np.min(valid_losses):
+            torch.save(encoder.state_dict(), os.path.join(
+                args.model_path, 'encoder-baseline.ckpt'.format(epoch+1, i+1)))
+            torch.save(decoder.state_dict(), os.path.join(
+                args.model_path, 'decoder-baseline.ckpt'.format(epoch+1, i+1)))
+            print('Models Saved.')
+
+    # Save losses as pickle
+    with open(args.model_path + 'training_losses.txt', 'w') as f1:
+        pickle.dump(training_losses, f1)
+    with open(args.model_path + 'valid_losses.txt', 'w') as f2:
+        pickle.dump(valid_losses, f2)
+    print('Loss Values Saved, Training Finished.')
 
 
 if __name__ == '__main__':
@@ -130,8 +138,6 @@ if __name__ == '__main__':
                         help='path for validation annotation json file')
     parser.add_argument('--log_step', type=int, default=100,
                         help='step size for prining log info')
-    parser.add_argument('--save_step', type=int, default=1000,
-                        help='step size for saving trained models')
 
     # Model parameters
     parser.add_argument('--embedding_size', type=int, default=100,
@@ -146,5 +152,4 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', type=int, default=2)
     parser.add_argument('--learning_rate', type=float, default=0.001)
     args = parser.parse_args()
-    print(args)
     main(args)
