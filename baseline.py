@@ -23,11 +23,6 @@ class EncoderCNN(nn.Module):
         features = features.reshape(features.size(0), -1)
         features = self.linear(features)
         features = self.bn(features)
-<<<<<<< HEAD
-=======
-        print("encoder features: ", features.shape)
-
->>>>>>> 4c301cb18e14da3311abcb97e1befb9ea69259cc
         return features
 
 
@@ -127,6 +122,7 @@ class DecoderRNN(nn.Module):
 
         inputs_iter = packed[0]
         batch_size_iter = packed[1]
+        pdb.set_trace()
 
         hiddens, _ = self.rnn(packed)
         outputs = self.linear(hiddens[0])
