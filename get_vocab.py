@@ -32,7 +32,7 @@ def build_vocab(json, threshold, subset_id):
     """Build a simple vocabulary wrapper."""
     coco = COCO(json)
     counter = Counter()
-    ids = coco.anns.keys()
+    # ids = coco.anns.keys()
     with open("data/annotations/ids_train.json", 'rb') as f:
         subset_ids = js.load(f)['ids']
     # print("ids: ", len(ids))

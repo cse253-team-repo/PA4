@@ -23,6 +23,7 @@ class CocoDataset(data.Dataset):
         """
         self.root = root
         self.coco = COCO(json)
+        print(self.coco.anns)
         self.ids = ids
         self.vocab = vocab
         self.transform = transform
@@ -133,7 +134,7 @@ if __name__ == "__main__":
     
     train_loader = get_loader(root_train, json_train, ids, vocab, transform, 4, False, 1)
     for i, (images, captions, lengths) in enumerate(train_loader):
-        print("images shape:", images.shape)
+        # print("images shape:", images.shape)
         # print("captions: ", captions)
         # print("lengths: ", lengths)
         break
