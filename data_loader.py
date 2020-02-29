@@ -123,7 +123,9 @@ if __name__ == "__main__":
 
     with open("data/vocab.pkl", 'rb') as f:
         vocab = pickle.load(f)
-
+    print(vocab.word2idx)
+    print(vocab.idx2word)
+    '''
     with open("data/annotations/ids_train.json", 'rb') as f:
         # print(js.load(f).keys())
         dic = js.load(f)
@@ -154,3 +156,4 @@ if __name__ == "__main__":
         print("captions: ", captions)
         print("lengths: ", lengths)
         break
+    '''
