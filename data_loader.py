@@ -9,7 +9,7 @@ from PIL import Image
 from get_vocab import Vocabulary
 from pycocotools.coco import COCO
 import json as js
-
+import pdb
 
 class CocoDataset(data.Dataset):
     """COCO Custom Dataset compatible with torch.utils.data.DataLoader."""
@@ -40,14 +40,12 @@ class CocoDataset(data.Dataset):
         path = coco.loadImgs(img_id)[0]['file_name']
 
         image = Image.open(os.path.join(self.root, path)).convert('RGB')
-        if min(image.size) < self.transform.transforms[0].size[0]:
-            # ratio = self.transform.transforms[0].size[0] / min(image.size)
-            # new_size = tuple([int(x*ratio) for x in image.size])
-            # new_size = (int(min(image.size)*ratio),int(min(image.size)*ratio))
-            new_size = (256, 256)
-            image = image.resize(new_size, Image.ANTIALIAS)
 
         if self.transform is not None:
+            # check the size of the image. If less than the threshold, resize it.
+            if min(image.size) < self.transform.transforms[0].size[0]:
+                new_size = (256, 256)
+                image = image.resize(new_size, Image.ANTIALIAS)
             image = self.transform(image)
 
         # Convert caption (string) to word ids.
@@ -137,6 +135,7 @@ if __name__ == "__main__":
     train_loader = get_loader(root_train, json_train,
                               ids, vocab, transform, 4, False, 1)
     for i, (images, captions, lengths) in enumerate(train_loader):
+        pdb.set_trace()
         print("images shape:", images.shape)
         print("captions: ", captions)
         print("lengths: ", lengths)

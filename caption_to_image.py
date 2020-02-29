@@ -2,6 +2,7 @@ import csv
 import pickle
 import json
 
+
 with open('TrainImageIds.csv', 'r') as f:
     reader = csv.reader(f)
     trainIds = list(reader)

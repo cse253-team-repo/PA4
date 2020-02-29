@@ -1,12 +1,12 @@
 import nltk
-# nltk.download('punkt')
+#nltk.download('punkt')
 import json as js
 import pickle
 import argparse
 from collections import Counter
 from pycocotools.coco import COCO
 from gensim.models import Word2Vec
-
+import os
 
 class Vocabulary(object):
     """Simple vocabulary wrapper."""
@@ -74,7 +74,7 @@ def main(args):
     vocab, w2v = build_vocab(json=args.caption_path, threshold=args.threshold,
                              subset_id=args.subset_id_path, embedding_size=args.embedding_size)
 
-    w2v_path = args.w2v_path + 'w2v_' + str(args.embedding_size) + '.model'
+    w2v_path = os.path.join(args.w2v_path, 'w2v_' + str(args.embedding_size) + '.model')
     vocab_path = args.vocab_path
     w2v.save(w2v_path)
     with open(vocab_path, 'wb') as f:

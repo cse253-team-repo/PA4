@@ -10,6 +10,7 @@ from baseline import EncoderCNN, DecoderRNN
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
 import json as js
+import pdb
 
 
 # Device configuration
@@ -40,6 +41,7 @@ def main(args):
     data_loader = get_loader(args.image_dir, args.caption_path, ids, vocab,
                              transform, args.batch_size,
                              shuffle=False, num_workers=args.num_workers)
+    pdb.set_trace()
 
     # Build the models
     encoder = EncoderCNN(args.embed_size).to(device)

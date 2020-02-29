@@ -138,7 +138,6 @@ if __name__ == '__main__':
                         help='path for validation annotation json file')
     parser.add_argument('--log_step', type=int, default=100,
                         help='step size for prining log info')
-
     # Model parameters
     parser.add_argument('--embedding_size', type=int, default=100,
                         help='dimension of word embedding vectors')
