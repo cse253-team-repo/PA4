@@ -1,0 +1,23 @@
+model_path: 'models/'
+crop_size: 224
+ids_path: 'data/annotations/ids_train.json'
+vocab_path: 'data/vocab.pkl'
+image_dir: 'data/images/train'
+caption_path: 'data/annotations/captions_train2014.json'
+valid_ids_path: 'data/annotations/ids_val.json'
+valid_image_dir: 'data/images/test'
+valid_caption_path: 'data/annotations/captions_val2014.json'
+
+log_step: 100
+save_step: 1000
+
+# Model parameters
+embedding_size: 100
+hidden_size: 512
+num_layers: 1
+num_epochs: 50
+batch_size: 128
+num_workers: 2
+learning_rate: 0.001
+
+

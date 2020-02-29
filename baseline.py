@@ -6,7 +6,6 @@ from torch.utils.data import WeightedRandomSampler
 from torch.autograd import Variable
 from gensim.models import Word2Vec
 import numpy as np
-import pdb
 
 class EncoderCNN(nn.Module):
     def __init__(self, embedding_size):
@@ -35,10 +34,7 @@ class EncoderCNN(nn.Module):
         features = features.reshape(features.size(0), -1)
         features = self.linear(features)
         features = self.bn(features)
-<<<<<<< HEAD
-=======
 
->>>>>>> 18246854ed1a54a1321885a04e1b5d2cb64da53d
         return features
 
 
@@ -71,7 +67,6 @@ class DecoderLSTM(nn.Module):
     def forward(self, features, captions, lengths, states=None):
         hiddens = []
         embeddings = self.embedding(captions)
-        pdb.set_trace()
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
 
@@ -156,7 +151,6 @@ class DecoderRNN(nn.Module):
 
         inputs_iter = packed[0]
         batch_size_iter = packed[1]
-        pdb.set_trace()
 
         hiddens, _ = self.rnn(packed)
         outputs = self.linear(hiddens[0])
@@ -166,10 +160,8 @@ class DecoderRNN(nn.Module):
                features,
                states=None,
                stochastic=False):
-
         sampled_ids = []
         inputs = features.unsqueeze(1)
-
         for i in range(self.max_length):
             hiddens, states = self.rnn(inputs, states)
             outputs = self.linear(hiddens.squeeze(1))
@@ -179,11 +171,9 @@ class DecoderRNN(nn.Module):
                     torch.nn.functional.softmax(outputs, dim=2), outputs.shape[2])
             else:
                 _, predicted = outputs.max(1)
-
             sampled_ids.append(predicted)
             inputs = self.embedding(predicted)
             inputs = inputs.unsqueeze(1)
-
         sampled_ids = torch.stack(sampled_ids, 1)
         return sampled_ids
 

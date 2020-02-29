@@ -10,6 +10,8 @@ from get_vocab import Vocabulary
 from baseline import EncoderCNN, DecoderLSTM
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
+from attrdict import AttrDict
+from utils import *
 import pdb
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -83,7 +85,6 @@ def main(args):
         for i, (images, captions, lengths) in enumerate(train_loader):
             images = images.to(device)
             captions = captions.to(device)
-            pdb.set_trace()
             targets = pack_padded_sequence(
                 captions, lengths, batch_first=True)[0]
             
@@ -129,38 +130,6 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--model_path', type=str,
-                        default='models/', help='path for saving trained models')
-    parser.add_argument('--crop_size', type=int, default=224,
-                        help='size for randomly cropping images')
-    parser.add_argument('--ids_path', type=str,
-                        default='data/annotations/ids_train.json', help='path for ids')
-    parser.add_argument('--vocab_path', type=str,
-                        default='data/vocab.pkl', help='path for vocabulary wrapper')
-    parser.add_argument('--image_dir', type=str,
-                        default='data/images/train', help='directory for resized images')
-    parser.add_argument('--caption_path', type=str, default='data/annotations/captions_train2014.json',
-                        help='path for train annotation json file')
-    parser.add_argument('--valid_ids_path', type=str,
-                        default='data/annotations/ids_val.json', help='path for validation ids')
-    parser.add_argument('--valid_image_dir', type=str,
-                        default='data/images/test', help='directory for validation images')
-    parser.add_argument('--valid_caption_path', type=str, default='data/annotations/captions_val2014.json',
-                        help='path for validation annotation json file')
-    parser.add_argument('--log_step', type=int, default=100,
-                        help='step size for prining log info')
-    # Model parameters
-    parser.add_argument('--embedding_size', type=int, default=100,
-                        help='dimension of word embedding vectors')
-    parser.add_argument('--hidden_size', type=int, default=512,
-                        help='dimension of lstm hidden states')
-    parser.add_argument('--num_layers', type=int, default=1,
-                        help='number of layers in lstm')
-
-    parser.add_argument('--num_epochs', type=int, default=50)
-    parser.add_argument('--batch_size', type=int, default=128)
-    parser.add_argument('--num_workers', type=int, default=2)
-    parser.add_argument('--learning_rate', type=float, default=0.001)
-    args = parser.parse_args()
+    args = load_config(path="config/config.yaml")
+    args = AttrDict(args)
     main(args)
