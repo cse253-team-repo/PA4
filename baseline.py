@@ -11,11 +11,23 @@ import pdb
 class EncoderCNN(nn.Module):
     def __init__(self, embedding_size):
         super(EncoderCNN, self).__init__()
-        resnet = models.resnet50(pretrained=True)
-        modules = list(resnet.children())[:-1]
-        self.resnet = nn.Sequential(*modules)
-        self.linear = nn.Linear(resnet.fc.in_features, embedding_size)
+        self.resnet = self.load_encoder()
+        self.linear = nn.Linear(self.infeature, embedding_size)
         self.bn = nn.BatchNorm1d(embedding_size, momentum=0.01)
+
+    def load_encoder(self, backbone='resnet50'):
+        pretrained_net = models.resnet50(pretrained=True)
+        self.infeature= pretrained_net.fc.in_features
+        encoder = nn.Sequential()
+
+        if backbone.startswith('res'):
+            for idx, layer in enumerate(pretrained_net.children()):
+                # Change the first conv and last linear layer
+                if isinstance(layer, nn.Linear) == False and isinstance(layer, nn.AdaptiveAvgPool2d) == False:
+                    encoder.add_module(str(idx), layer)
+        elif backbone.startswith('vgg'):
+            encoder=pretrained_net.features
+        return encoder
 
     def forward(self, images):
         with torch.no_grad():
@@ -23,6 +35,10 @@ class EncoderCNN(nn.Module):
         features = features.reshape(features.size(0), -1)
         features = self.linear(features)
         features = self.bn(features)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 18246854ed1a54a1321885a04e1b5d2cb64da53d
         return features
 
 
@@ -130,8 +146,8 @@ class DecoderRNN(nn.Module):
 
     def sample(self, features, states=None, stochastic=False):
         sampled_ids = []
-        outputs_list = []
         inputs = features.unsqueeze(1)
+
         for i in range(self.max_length):
             hiddens, states = self.rnn(inputs, states)
             outputs = self.linear(hiddens.squeeze(1))
@@ -142,11 +158,9 @@ class DecoderRNN(nn.Module):
             else:
                 _, predicted = outputs.max(1)
 
-            outputs_list.append(outputs)
             sampled_ids.append(predicted)
             inputs = self.embedding(predicted)
             inputs = inputs.unsqueeze(1)
 
         sampled_ids = torch.stack(sampled_ids, 1)
-        outputs_list = torch.stack(outputs_list, 1)
-        return sampled_ids, outputs_list
+        return sampled_ids
