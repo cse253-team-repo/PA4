@@ -7,20 +7,15 @@ import pickle
 import json as js
 from data_loader import get_loader
 from get_vocab import Vocabulary
-from baseline import EncoderCNN, DecoderLSTM, DecoderRNN
+from baseline import EncoderCNN, DecoderLSTM
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def generate_caps(captions, predictions, vocab):
-    num_samples = 2
-    for cap_id in range(num_samples):
-        pass
-        
 
-def compute_valid_loss(encoder, decoder, valid_loader, vocab):
+def compute_valid_loss(encoder, decoder, valid_loader):
     encoder.eval()
     decoder.eval()
     criterion = nn.CrossEntropyLoss()
@@ -29,15 +24,15 @@ def compute_valid_loss(encoder, decoder, valid_loader, vocab):
         for i, (images, captions, lengths) in enumerate(valid_loader):
             images = images.to(device)
             captions = captions.to(device)
+            print("captions len: ", len(captions[0]))
+            print("lengths 0: ", lengths[0])
             targets = pack_padded_sequence(
                 captions, lengths, batch_first=True)[0]
             features = encoder(images)
-            sampled_ids, outputs = decoder.sample(features)
-            print("samples ids: ", sampled_ids.shape)
-            print("outputs shape: ",outputs.shape)
+            outputs = decoder(features, captions, lengths)
             loss = criterion(outputs, targets)
             losses.append(loss.item())
-        
+
     return np.mean(losses)
 
 
@@ -73,7 +68,7 @@ def main(args):
                               vocab, transform, args.batch_size, shuffle=False, num_workers=args.num_workers)
 
     encoder = EncoderCNN(args.embedding_size).to(device)
-    decoder = DecoderRNN(args.embedding_size, args.hidden_size,
+    decoder = DecoderLSTM(args.embedding_size, args.hidden_size,
                           len(vocab), args.num_layers).to(device)
 
     criterion = nn.CrossEntropyLoss()
@@ -91,7 +86,8 @@ def main(args):
             captions = captions.to(device)
             targets = pack_padded_sequence(
                 captions, lengths, batch_first=True)[0]
-
+            
+            print("captions:")
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
             loss = criterion(outputs, targets)
@@ -106,9 +102,11 @@ def main(args):
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                       .format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item())))
             break
+
+
         training_loss = np.mean(training_losses_epoch)
         training_losses.append(training_loss)
-        valid_loss = compute_valid_loss(encoder, decoder, valid_loader, vocab)
+        valid_loss = compute_valid_loss(encoder, decoder, valid_loader)
         valid_losses.append(valid_loss)
         print('Epoch {}: Training Loss = {:.4f}, Validation Loss = {:.4f}'.format(
             epoch, training_loss, valid_loss))
