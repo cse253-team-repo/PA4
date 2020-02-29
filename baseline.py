@@ -54,9 +54,6 @@ class DecoderLSTM(nn.Module):
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
 
-        inputs_iter = packed[0]
-        batch_size_iter = packed[1]
-
         # for i in range(max(lengths)):
         # for i in range(len(packed)):
         #     # hidden, states = self.lstm(embeddings[:,i].unsqueeze(1), states)
@@ -112,7 +109,7 @@ class DecoderRNN(nn.Module):
         self.rnn = nn.RNN(embedding_size, hidden_size,
                           num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
-        self.max_length = 10  # max_length
+        self.max_length = 25  # max_length
 
     def forward(self, features, captions, lengths, states=None):
         hiddens = []

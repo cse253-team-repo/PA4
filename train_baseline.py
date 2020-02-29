@@ -15,7 +15,7 @@ from torchvision import transforms
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def compute_valid_loss(encoder, decoder, valid_loader):
+def compute_valid_loss(encoder, decoder, valid_loader, vocab):
     encoder.eval()
     decoder.eval()
     criterion = nn.CrossEntropyLoss()
@@ -24,14 +24,27 @@ def compute_valid_loss(encoder, decoder, valid_loader):
         for i, (images, captions, lengths) in enumerate(valid_loader):
             images = images.to(device)
             captions = captions.to(device)
-            print("captions len: ", len(captions[0]))
-            print("lengths 0: ", lengths[0])
             targets = pack_padded_sequence(
                 captions, lengths, batch_first=True)[0]
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
+            sample_ids = decoder.sample(features)
             loss = criterion(outputs, targets)
             losses.append(loss.item())
+    
+    num_samples = 3
+    gt = [''] * num_samples
+    preds = [''] * num_samples
+
+    for sample_id in range(num_samples):
+        for gt_token_id in captions[sample_id]:
+            gt[sample_id] += vocab.idx2word[gt_token_id]
+
+        for pred_token_id in sample_ids[sample_id]:
+            preds[sample_id] += vocab.idx2word[pred_token_id]
+            
+    print("GROUND TRUTH: ", gt)
+    print("PREDICTIONS: ", preds)
 
     return np.mean(losses)
 
@@ -42,7 +55,6 @@ def main(args):
 
     transform = transforms.Compose([
         transforms.RandomCrop(args.crop_size),
-        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406),
                              (0.229, 0.224, 0.225))])
@@ -87,7 +99,6 @@ def main(args):
             targets = pack_padded_sequence(
                 captions, lengths, batch_first=True)[0]
             
-            print("captions:")
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
             loss = criterion(outputs, targets)
@@ -101,12 +112,10 @@ def main(args):
             if i % args.log_step == 0:
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                       .format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item())))
-            break
-
 
         training_loss = np.mean(training_losses_epoch)
         training_losses.append(training_loss)
-        valid_loss = compute_valid_loss(encoder, decoder, valid_loader)
+        valid_loss = compute_valid_loss(encoder, decoder, valid_loader, vocab)
         valid_losses.append(valid_loss)
         print('Epoch {}: Training Loss = {:.4f}, Validation Loss = {:.4f}'.format(
             epoch, training_loss, valid_loss))
@@ -114,9 +123,9 @@ def main(args):
         # Save the best model
         if valid_loss <= np.min(valid_losses):
             torch.save(encoder.state_dict(), os.path.join(
-                args.model_path, 'encoder-baseline.ckpt'.format(epoch+1, i+1)))
+                args.model_path, 'encoder-baseline'.format(epoch+1, i+1)))
             torch.save(decoder.state_dict(), os.path.join(
-                args.model_path, 'decoder-baseline.ckpt'.format(epoch+1, i+1)))
+                args.model_path, 'decoder-baseline'.format(epoch+1, i+1)))
             print('Models Saved.')
 
         # Save losses as pickle
