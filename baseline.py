@@ -11,11 +11,23 @@ import numpy as np
 class EncoderCNN(nn.Module):
     def __init__(self, embedding_size):
         super(EncoderCNN, self).__init__()
-        resnet = models.resnet50(pretrained=True)
-        modules = list(resnet.children())[:-1]
-        self.resnet = nn.Sequential(*modules)
-        self.linear = nn.Linear(resnet.fc.in_features, embedding_size)
+        self.resnet = self.load_encoder()
+        self.linear = nn.Linear(self.infeature, embedding_size)
         self.bn = nn.BatchNorm1d(embedding_size, momentum=0.01)
+
+    def load_encoder(self, backbone='resnet50'):
+        pretrained_net = models.resnet50(pretrained=True)
+        self.infeature= pretrained_net.fc.in_features
+        encoder = nn.Sequential()
+
+        if backbone.startswith('res'):
+            for idx, layer in enumerate(pretrained_net.children()):
+                # Change the first conv and last linear layer
+                if isinstance(layer, nn.Linear) == False and isinstance(layer, nn.AdaptiveAvgPool2d) == False:
+                    encoder.add_module(str(idx), layer)
+        elif backbone.startswith('vgg'):
+            encoder=pretrained_net.features
+        return encoder
 
     def forward(self, images):
         with torch.no_grad():
