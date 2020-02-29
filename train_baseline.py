@@ -90,7 +90,6 @@ def main(args):
             if i % args.log_step == 0:
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                       .format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item())))
-                break
 
         training_loss = np.mean(training_losses_epoch)
         training_losses.append(training_loss)
