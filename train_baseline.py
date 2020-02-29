@@ -36,8 +36,7 @@ def compute_valid_loss(encoder, decoder, valid_loader, vocab):
             print("samples ids: ", sampled_ids.shape)
             print("outputs shape: ",outputs.shape)
             loss = criterion(outputs, targets)
-            losses.append(loss.item())
-        
+            losses.append(loss.item())     
     return np.mean(losses)
 
 
