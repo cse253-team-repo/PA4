@@ -62,8 +62,7 @@ def main(args):
                           len(vocab), args.num_layers).to(device)
 
     criterion = nn.CrossEntropyLoss()
-    params = list(encoder.parameters()) + \
-        list(encoder.bn.parameters()) + list(decoder.parameters())
+    params = list(encoder.parameters()) + list(decoder.parameters())
     optimizer = torch.optim.Adam(params, lr=args.learning_rate)
 
     total_step = len(data_loader)
@@ -109,9 +108,9 @@ def main(args):
             print('Models Saved.')
 
     # Save losses as pickle
-    with open(args.model_path + 'training_losses.txt', 'w') as f1:
+    with open(args.model_path + 'training_losses.txt', 'wb') as f1:
         pickle.dump(training_losses, f1)
-    with open(args.model_path + 'valid_losses.txt', 'w') as f2:
+    with open(args.model_path + 'valid_losses.txt', 'wb') as f2:
         pickle.dump(valid_losses, f2)
     print('Loss Values Saved, Training Finished.')
 
@@ -147,7 +146,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_layers', type=int, default=1,
                         help='number of layers in lstm')
 
-    parser.add_argument('--num_epochs', type=int, default=100)
+    parser.add_argument('--num_epochs', type=int, default=50)
     parser.add_argument('--batch_size', type=int, default=128)
     parser.add_argument('--num_workers', type=int, default=2)
     parser.add_argument('--learning_rate', type=float, default=0.001)
