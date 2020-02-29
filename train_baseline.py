@@ -10,7 +10,7 @@ from get_vocab import Vocabulary
 from baseline import EncoderCNN, DecoderLSTM
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
-
+import pdb
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -74,6 +74,7 @@ def main(args):
         for i, (images, captions, lengths) in enumerate(data_loader):
             images = images.to(device)
             captions = captions.to(device)
+            pdb.set_trace()
             targets = pack_padded_sequence(
                 captions, lengths, batch_first=True)[0]
 

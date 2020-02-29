@@ -6,7 +6,7 @@ from torch.utils.data import WeightedRandomSampler
 from torch.autograd import Variable
 from gensim.models import Word2Vec
 import numpy as np
-
+import pdb
 
 class EncoderCNN(nn.Module):
     def __init__(self, embedding_size):
@@ -50,6 +50,7 @@ class DecoderLSTM(nn.Module):
     def forward(self, features, captions, lengths, states=None):
         hiddens = []
         embeddings = self.embedding(captions)
+        pdb.set_trace()
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
 
