@@ -7,15 +7,22 @@ import pickle
 import json as js
 from data_loader import get_loader
 from get_vocab import Vocabulary
-from baseline import EncoderCNN, DecoderLSTM
+from baseline import EncoderCNN, DecoderLSTM, DecoderRNN
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
 import pdb
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+def generate_caps(captions, predictions, vocab):
+    num_samples = 2
+    for cap_id in range(num_samples):
+        pass
+        
 
-def compute_valid_loss(encoder, decoder, valid_loader):
+def compute_valid_loss(encoder, decoder, valid_loader, vocab):
+    encoder.eval()
+    decoder.eval()
     criterion = nn.CrossEntropyLoss()
     losses = []
     with torch.no_grad():
@@ -25,10 +32,12 @@ def compute_valid_loss(encoder, decoder, valid_loader):
             targets = pack_padded_sequence(
                 captions, lengths, batch_first=True)[0]
             features = encoder(images)
-            outputs = decoder(features, captions, lengths)
+            sampled_ids, outputs = decoder.sample(features)
+            print("samples ids: ", sampled_ids.shape)
+            print("outputs shape: ",outputs.shape)
             loss = criterion(outputs, targets)
             losses.append(loss.item())
-
+        
     return np.mean(losses)
 
 
@@ -47,31 +56,37 @@ def main(args):
         vocab = pickle.load(f)
 
     with open(args.ids_path, 'rb') as f:
-        train_ids = js.load(f)['ids']
+        dic = js.load(f)
+        train_ids = dic['ids_train']
+        val_ids = dic['ids_val']
 
     with open(args.valid_ids_path, 'rb') as f:
-        valid_ids = js.load(f)['ids']
+        test_ids = js.load(f)['ids']
 
-    data_loader = get_loader(args.image_dir, args.caption_path, train_ids, vocab,
+    train_loader = get_loader(args.image_dir, args.caption_path, train_ids, vocab,
                              transform, args.batch_size, shuffle=False, num_workers=args.num_workers)
-    valid_loader = get_loader(args.valid_image_dir, args.valid_caption_path, valid_ids,
+    
+    valid_loader = get_loader(args.image_dir, args.caption_path, val_ids, vocab,
+                             transform, args.batch_size, shuffle=False, num_workers=args.num_workers)
+
+    test_loader = get_loader(args.valid_image_dir, args.valid_caption_path, test_ids,
                               vocab, transform, args.batch_size, shuffle=False, num_workers=args.num_workers)
 
     encoder = EncoderCNN(args.embedding_size).to(device)
-    decoder = DecoderLSTM(args.embedding_size, args.hidden_size,
+    decoder = DecoderRNN(args.embedding_size, args.hidden_size,
                           len(vocab), args.num_layers).to(device)
 
     criterion = nn.CrossEntropyLoss()
     params = list(encoder.parameters()) + list(decoder.parameters())
     optimizer = torch.optim.Adam(params, lr=args.learning_rate)
 
-    total_step = len(data_loader)
+    total_step = len(train_loader)
     training_losses = []
     valid_losses = []
     for epoch in range(args.num_epochs):
         training_losses_epoch = []
 
-        for i, (images, captions, lengths) in enumerate(data_loader):
+        for i, (images, captions, lengths) in enumerate(train_loader):
             images = images.to(device)
             captions = captions.to(device)
             pdb.set_trace()
@@ -91,10 +106,10 @@ def main(args):
             if i % args.log_step == 0:
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                       .format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item())))
-
+            break
         training_loss = np.mean(training_losses_epoch)
         training_losses.append(training_loss)
-        valid_loss = compute_valid_loss(encoder, decoder, valid_loader)
+        valid_loss = compute_valid_loss(encoder, decoder, valid_loader, vocab)
         valid_losses.append(valid_loss)
         print('Epoch {}: Training Loss = {:.4f}, Validation Loss = {:.4f}'.format(
             epoch, training_loss, valid_loss))
@@ -107,11 +122,12 @@ def main(args):
                 args.model_path, 'decoder-baseline.ckpt'.format(epoch+1, i+1)))
             print('Models Saved.')
 
-    # Save losses as pickle
-    with open(args.model_path + 'training_losses.txt', 'wb') as f1:
-        pickle.dump(training_losses, f1)
-    with open(args.model_path + 'valid_losses.txt', 'wb') as f2:
-        pickle.dump(valid_losses, f2)
+        # Save losses as pickle
+        with open(args.model_path + 'training_losses.txt', 'wb') as f1:
+            pickle.dump(training_losses, f1)
+        with open(args.model_path + 'valid_losses.txt', 'wb') as f2:
+            pickle.dump(valid_losses, f2)
+
     print('Loss Values Saved, Training Finished.')
 
 

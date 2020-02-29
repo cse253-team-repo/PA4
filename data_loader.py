@@ -121,9 +121,15 @@ if __name__ == "__main__":
 
     with open("data/vocab.pkl", 'rb') as f:
         vocab = pickle.load(f)
-
+    print(vocab.word2idx)
+    print(vocab.idx2word)
+    '''
     with open("data/annotations/ids_train.json", 'rb') as f:
-        ids = js.load(f)['ids']
+        # print(js.load(f).keys())
+        dic = js.load(f)
+
+        ids_train = dic['ids_train']
+        ids_val = dic['ids_val']
 
     transform = transforms.Compose([
         transforms.RandomCrop(224),
@@ -133,10 +139,20 @@ if __name__ == "__main__":
                              (0.229, 0.224, 0.225))])
 
     train_loader = get_loader(root_train, json_train,
-                              ids, vocab, transform, 4, False, 1)
+                              ids_train, vocab, transform, 4, False, 1)
+    val_loader = get_loader(root_train, json_train,
+                              ids_val, vocab, transform, 4, False, 1)
+
     for i, (images, captions, lengths) in enumerate(train_loader):
         pdb.set_trace()
         print("images shape:", images.shape)
         print("captions: ", captions)
         print("lengths: ", lengths)
         break
+
+    for i, (images, captions, lengths) in enumerate(val_loader):
+        print("images shape:", images.shape)
+        print("captions: ", captions)
+        print("lengths: ", lengths)
+        break
+    '''

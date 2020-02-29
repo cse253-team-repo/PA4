@@ -23,6 +23,11 @@ class EncoderCNN(nn.Module):
         features = features.reshape(features.size(0), -1)
         features = self.linear(features)
         features = self.bn(features)
+<<<<<<< HEAD
+=======
+        print("encoder features: ", features.shape)
+
+>>>>>>> 4c301cb18e14da3311abcb97e1befb9ea69259cc
         return features
 
 
@@ -129,8 +134,8 @@ class DecoderRNN(nn.Module):
 
     def sample(self, features, states=None, stochastic=False):
         sampled_ids = []
+        outputs_list = []
         inputs = features.unsqueeze(1)
-
         for i in range(self.max_length):
             hiddens, states = self.rnn(inputs, states)
             outputs = self.linear(hiddens.squeeze(1))
@@ -141,9 +146,11 @@ class DecoderRNN(nn.Module):
             else:
                 _, predicted = outputs.max(1)
 
+            outputs_list.append(outputs)
             sampled_ids.append(predicted)
             inputs = self.embedding(predicted)
             inputs = inputs.unsqueeze(1)
 
         sampled_ids = torch.stack(sampled_ids, 1)
-        return sampled_ids
+        outputs_list = torch.stack(outputs_list, 1)
+        return sampled_ids, outputs_list
