@@ -70,7 +70,7 @@ class DecoderLSTM(nn.Module):
         outputs = self.linear(hiddens[0])
         return outputs
 
-    def sample(self, features, states=None, stochastic=False):
+    def sample(self, features, states=None, stochastic=False, temperature=1):
         sampled_ids = []
         inputs = features.unsqueeze(1)
 
@@ -79,6 +79,7 @@ class DecoderLSTM(nn.Module):
             outputs = self.linear(hiddens.squeeze(1))
 
             if stochastic == True:
+                outputs = outputs / temperature
                 predicted = WeightedRandomSampler(
                     torch.nn.functional.softmax(outputs, dim=2), outputs.shape[2])
             else:
