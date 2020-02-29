@@ -37,6 +37,10 @@ def compute_valid_loss(encoder, decoder, valid_loader):
     return np.mean(losses)
 
 
+
+
+
+
 def main(args):
     if not os.path.exists(args.model_path):
         os.mkdir(args.model_path)
