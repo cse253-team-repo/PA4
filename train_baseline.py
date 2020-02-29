@@ -106,11 +106,12 @@ def main(args):
                 args.model_path, 'decoder-baseline.ckpt'.format(epoch+1, i+1)))
             print('Models Saved.')
 
-    # Save losses as pickle
-    with open(args.model_path + 'training_losses.txt', 'wb') as f1:
-        pickle.dump(training_losses, f1)
-    with open(args.model_path + 'valid_losses.txt', 'wb') as f2:
-        pickle.dump(valid_losses, f2)
+        # Save losses as pickle
+        with open(args.model_path + 'training_losses.txt', 'wb') as f1:
+            pickle.dump(training_losses, f1)
+        with open(args.model_path + 'valid_losses.txt', 'wb') as f2:
+            pickle.dump(valid_losses, f2)
+            
     print('Loss Values Saved, Training Finished.')
 
 

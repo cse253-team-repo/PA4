@@ -7,7 +7,6 @@ from collections import Counter
 from pycocotools.coco import COCO
 from gensim.models import Word2Vec
 
-
 class Vocabulary(object):
     """Simple vocabulary wrapper."""
 
@@ -30,17 +29,12 @@ class Vocabulary(object):
     def __len__(self):
         return len(self.word2idx)
 
-
 def build_vocab(json, threshold, subset_id, embedding_size):
     """Build a simple vocabulary wrapper and word2vec model."""
     coco = COCO(json)
     counter = Counter()
-<<<<<<< HEAD
-    # ids = coco.anns.keys()
-=======
     ids = coco.anns.keys()
     sentences = []
->>>>>>> 3e78d408637c3957265f73d9463dddd598127707
     with open("data/annotations/ids_train.json", 'rb') as f:
         subset_ids = js.load(f)['ids']
     # print("ids: ", len(ids))

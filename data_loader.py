@@ -25,7 +25,6 @@ class CocoDataset(data.Dataset):
         """
         self.root = root
         self.coco = COCO(json)
-        print(self.coco.anns)
         self.ids = ids
         self.vocab = vocab
         self.transform = transform
@@ -126,7 +125,11 @@ if __name__ == "__main__":
         vocab = pickle.load(f)
 
     with open("data/annotations/ids_train.json", 'rb') as f:
-        ids = js.load(f)['ids']
+        # print(js.load(f).keys())
+        dic = js.load(f)
+
+        ids_train = dic['ids_train']
+        ids_val = dic['ids_val']
 
     transform = transforms.Compose([
         transforms.RandomCrop(224),
@@ -136,16 +139,18 @@ if __name__ == "__main__":
                              (0.229, 0.224, 0.225))])
 
     train_loader = get_loader(root_train, json_train,
-                              ids, vocab, transform, 4, False, 1)
+                              ids_train, vocab, transform, 4, False, 1)
+    val_loader = get_loader(root_train, json_train,
+                              ids_val, vocab, transform, 4, False, 1)
+
     for i, (images, captions, lengths) in enumerate(train_loader):
-<<<<<<< HEAD
-        # print("images shape:", images.shape)
-        # print("captions: ", captions)
-        # print("lengths: ", lengths)
-        break
-=======
         print("images shape:", images.shape)
         print("captions: ", captions)
         print("lengths: ", lengths)
         break
->>>>>>> 3e78d408637c3957265f73d9463dddd598127707
+
+    for i, (images, captions, lengths) in enumerate(val_loader):
+        print("images shape:", images.shape)
+        print("captions: ", captions)
+        print("lengths: ", lengths)
+        break
