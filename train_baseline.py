@@ -7,7 +7,7 @@ import pickle
 import json as js
 from data_loader import get_loader
 from get_vocab import Vocabulary
-from baseline import EncoderCNN, DecoderLSTM
+from baseline import *
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
 

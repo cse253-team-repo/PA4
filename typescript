@@ -1340,4 +1340,164 @@ Traceback (most recent call last):
     main(args)
   File "train_baseline.py", line 87, in main
     len(vocab), args.num_layers, use_word2vec=True).to(device)
-  File 
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 130, in __init__
+    print(w2v.wv.shape)
+AttributeError: 'Word2VecKeyedVectors' object has no attribute 'shape'
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ python train_baseline.py
+loading annotations into memory...
+Done (t=0.93s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.97s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.37s)
+creating index...
+index created!
+Traceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 87, in main
+    len(vocab), args.num_layers, use_word2vec=True).to(device)
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 129, in __init__
+    w2v = gensim.models.KeyedVectors.load_word2vec_format('./data/w2v_' + str(embedding_size) + '.model')
+  File "/datasets/home/47/947/cs253wi20ae/.local/lib/python3.7/site-packages/gensim/models/keyedvectors.py", line 1498, in load_word2vec_format
+    limit=limit, datatype=datatype)
+  File "/datasets/home/47/947/cs253wi20ae/.local/lib/python3.7/site-packages/gensim/models/utils_any2vec.py", line 343, in _load_word2vec_format
+    header = utils.to_unicode(fin.readline(), encoding=encoding)
+  File "/datasets/home/47/947/cs253wi20ae/.local/lib/python3.7/site-packages/gensim/utils.py", line 359, in any2unicode
+    return unicode(text, encoding, errors=errors)
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0x80 in position 0: invalid start byte
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ python train_baseline.py
+loading annotations into memory...
+Done (t=0.77s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.97s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.45s)
+creating index...
+index created!
+Traceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 87, in main
+    len(vocab), args.num_layers, use_word2vec=True).to(device)
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 130, in __init__
+    w2v = gensim.models.KeyedVectors.load_word2vec_format('./data/w2v_100.model')
+  File "/datasets/home/47/947/cs253wi20ae/.local/lib/python3.7/site-packages/gensim/models/keyedvectors.py", line 1498, in load_word2vec_format
+    limit=limit, datatype=datatype)
+  File "/datasets/home/47/947/cs253wi20ae/.local/lib/python3.7/site-packages/gensim/models/utils_any2vec.py", line 343, in _load_word2vec_format
+    header = utils.to_unicode(fin.readline(), encoding=encoding)
+  File "/datasets/home/47/947/cs253wi20ae/.local/lib/python3.7/site-packages/gensim/utils.py", line 359, in any2unicode
+    return unicode(text, encoding, errors=errors)
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0x80 in position 0: invalid start byte
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ python train_baseline.py
+loading annotations into memory...
+Done (t=0.93s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=1.10s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.38s)
+creating index...
+index created!
+Epoch [0/50], Step [0/518], Loss: 8.6863, Perplexity: 5921.5058
+Epoch [0/50], Step [100/518], Loss: 3.7644, Perplexity: 43.1393
+^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^CTraceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 99, in main
+    for i, (images, captions, lengths) in enumerate(train_loader):
+  File "/opt/conda/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 804, in __next__
+    idx, data = self._get_data()
+  File "/opt/conda/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 771, in _get_data
+    success, data = self._try_get_data()
+  File "/opt/conda/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 724, in _try_get_data
+    data = self._data_queue.get(timeout=timeout)
+  File "/opt/conda/lib/python3.7/multiprocessing/queues.py", line 104, in get
+    if not self._poll(timeout):
+  File "/opt/conda/lib/python3.7/multiprocessing/connection.py", line 257, in poll
+    return self._poll(timeout)
+  File "/opt/conda/lib/python3.7/multiprocessing/connection.py", line 414, in _poll
+    r = wait([self], timeout)
+  File "/opt/conda/lib/python3.7/multiprocessing/connection.py", line 920, in wait
+    ready = selector.select(timeout)
+  File "/opt/conda/lib/python3.7/selectors.py", line 415, in select
+    fd_event_list = self._selector.poll(timeout)
+KeyboardInterrupt
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ git stash
+Saved working directory and index state WIP on master: a56fccf rewrite CNN
+gcs253wi20ae@cs253wi20ae-15504:~/PA4$ git pull
+Already up to date.
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ git pullstashpython train_baseline.py
+loading annotations into memory...
+Done (t=0.81s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.89s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.47s)
+creating index...
+index created!
+Epoch [0/50], Step [0/518], Loss: 8.6589, Perplexity: 5761.3877
+^X^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[B^[[A^[[A^[[A^[[A^[[A^CTraceback (most recent call last):
+  File "train_baseline.py", line 185, in <module>
+    main(args)
+  File "train_baseline.py", line 98, in main
+    for i, (images, captions, lengths) in enumerate(train_loader):
+  File "/opt/conda/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 804, in __next__
+    idx, data = self._get_data()
+  File "/opt/conda/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 771, in _get_data
+    success, data = self._try_get_data()
+  File "/opt/conda/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 724, in _try_get_data
+    data = self._data_queue.get(timeout=timeout)
+  File "/opt/conda/lib/python3.7/multiprocessing/queues.py", line 104, in get
+    if not self._poll(timeout):
+  File "/opt/conda/lib/python3.7/multiprocessing/connection.py", line 257, in poll
+    return self._poll(timeout)
+  File "/opt/conda/lib/python3.7/multiprocessing/connection.py", line 414, in _poll
+    r = wait([self], timeout)
+  File "/opt/conda/lib/python3.7/multiprocessing/connection.py", line 920, in wait
+    ready = selector.select(timeout)
+  File "/opt/conda/lib/python3.7/selectors.py", line 415, in select
+    fd_event_list = self._selector.poll(timeout)
+KeyboardInterrupt
+^C
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ git add .
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ git commit -m ''f'i'x' 'w'o'r'd'2'v'e'c'
+[master b6b01a1] fix word2vec
+ Committer: cs253wi20ae <cs253wi20ae@cs253wi20ae-15504.pods.cs253wi20ae.svc.cluster.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 1351 insertions(+), 9 deletions(-)
+ create mode 100644 typescript
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ git push
+Username for 'https://github.com': yuezrhb@gmail.com
+Password for 'https://yuezrhb@gmail.com@github.com': 
+Counting objects: 5, done.
+Delta compression using up to 64 threads.
+Compressing objects:  20% (1/5)   Compressing objects:  40% (2/5)   Compressing objects:  60% (3/5)   Compressing objects:  80% (4/5)   Compressing objects: 100% (5/5)   Compressing objects: 100% (5/5), done.
+Writing objects:  20% (1/5)   Writing objects:  40% (2/5)   Writing objects:  60% (3/5)   Writing objects:  80% (4/5)   Writing objects: 100% (5/5)   Writing objects: 100% (5/5), 8.30 KiB | 1.66 MiB/s, done.
+Total 5 (delta 3)
