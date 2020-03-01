@@ -125,7 +125,7 @@ if __name__ == "__main__":
         vocab = pickle.load(f)
     print(vocab.word2idx)
     print(vocab.idx2word)
-    '''
+    
     with open("data/annotations/ids_train.json", 'rb') as f:
         # print(js.load(f).keys())
         dic = js.load(f)
@@ -133,6 +133,10 @@ if __name__ == "__main__":
         ids_train = dic['ids_train']
         ids_val = dic['ids_val']
 
+        print('ids train: ', len(ids_train))
+        print('ids val: ', len(ids_val))
+
+    '''
     transform = transforms.Compose([
         transforms.RandomCrop(224),
         transforms.RandomHorizontalFlip(),

@@ -36,7 +36,9 @@ def build_vocab(json, threshold, subset_id, embedding_size):
     ids = coco.anns.keys()
     sentences = []
     with open("data/annotations/ids_train.json", 'rb') as f:
-        subset_ids = js.load(f)['ids']
+        dic = js.load(f)
+        subset_ids = dic['ids_train'] + dic['ids_val']
+
     # print("ids: ", len(ids))
     # print("subset ids: ", len(subset_ids))
     for i, id in enumerate(subset_ids):
@@ -80,6 +82,7 @@ def main(args):
 
     print("Total vocabulary size: {}".format(len(vocab)))
     print("Saved the vocabulary wrapper to '{}'".format(vocab_path))
+    print("Saved the word2vec vocab model to '{}'".format(w2v_path))
 
 
 if __name__ == '__main__':
