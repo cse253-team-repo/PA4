@@ -11,11 +11,23 @@ import numpy as np
 class EncoderCNN(nn.Module):
     def __init__(self, embedding_size):
         super(EncoderCNN, self).__init__()
-        resnet = models.resnet50(pretrained=True)
-        modules = list(resnet.children())[:-1]
-        self.resnet = nn.Sequential(*modules)
-        self.linear = nn.Linear(resnet.fc.in_features, embedding_size)
+        self.resnet = self.load_encoder()
+        self.linear = nn.Linear(self.infeature, embedding_size)
         self.bn = nn.BatchNorm1d(embedding_size, momentum=0.01)
+
+    def load_encoder(self, backbone='resnet50'):
+        pretrained_net = models.resnet50(pretrained=True)
+        self.infeature= pretrained_net.fc.in_features
+        encoder = nn.Sequential()
+
+        if backbone.startswith('res'):
+            for idx, layer in enumerate(pretrained_net.children()):
+                # Change the first conv and last linear layer
+                if isinstance(layer, nn.Linear) == False and isinstance(layer, nn.AdaptiveAvgPool2d) == False:
+                    encoder.add_module(str(idx), layer)
+        elif backbone.startswith('vgg'):
+            encoder=pretrained_net.features
+        return encoder
 
     def forward(self, images):
         with torch.no_grad():
@@ -28,7 +40,12 @@ class EncoderCNN(nn.Module):
 
 
 class DecoderLSTM(nn.Module):
-    def __init__(self, embedding_size, hidden_size, vocab_size, num_layers, use_word2vec=False):
+    def __init__(self,
+                 embedding_size,
+                 hidden_size,
+                 vocab_size,
+                 num_layers,
+                 use_word2vec=False):
         super(DecoderLSTM, self).__init__()
 
         if use_word2vec == True:
@@ -70,7 +87,11 @@ class DecoderLSTM(nn.Module):
         outputs = self.linear(hiddens[0])
         return outputs
 
-    def sample(self, features, states=None, stochastic=False, temperature=1):
+    def sample(self,
+               features,
+               states=None,
+               stochastic=False,
+               temperature=1):
         sampled_ids = []
         inputs = features.unsqueeze(1)
 
@@ -94,7 +115,12 @@ class DecoderLSTM(nn.Module):
 
 
 class DecoderRNN(nn.Module):
-    def __init__(self, embedding_size, hidden_size, vocab_size, num_layers, use_word2vec=False):
+    def __init__(self,
+                 embedding_size,
+                 hidden_size,
+                 vocab_size,
+                 num_layers,
+                 use_word2vec=False):
         super(DecoderRNN, self).__init__()
 
         if use_word2vec == True:
@@ -114,7 +140,11 @@ class DecoderRNN(nn.Module):
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.max_length = 10  # max_length
 
-    def forward(self, features, captions, lengths, states=None):
+    def forward(self,
+                features,
+                captions,
+                lengths,
+                states=None):
         hiddens = []
         embeddings = self.embedding(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
@@ -127,7 +157,11 @@ class DecoderRNN(nn.Module):
         outputs = self.linear(hiddens[0])
         return outputs
 
-    def sample(self, features, states=None, stochastic=False):
+    def sample(self,
+               features,
+               states=None,
+               stochastic=False):
+
         sampled_ids = []
         inputs = features.unsqueeze(1)
 
@@ -147,3 +181,17 @@ class DecoderRNN(nn.Module):
 
         sampled_ids = torch.stack(sampled_ids, 1)
         return sampled_ids
+
+class CaptionCNNRNN(nn.Module):
+    def __init__(self,
+                 args,
+                 len_vocab):
+        super(CaptionCNNRNN, self).__init__()
+        self.encoder = EncoderCNN(args.embed_size)
+        self.decoder = DecoderRNN(args.embed_size, args.hidden_size,
+                             len_vocab, args.num_layers, use_word2vec=True)
+
+    def forward(self,images,captions, lengths):
+        features = self.encoder(images)
+        outputs = self.decoder(features, captions, lengths)
+        return outputs
