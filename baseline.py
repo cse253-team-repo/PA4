@@ -22,7 +22,7 @@ class EncoderCNN(nn.Module):
         if backbone.startswith('res'):
             for idx, layer in enumerate(pretrained_net.children()):
                 # Change the first conv and last linear layer
-                if isinstance(layer, nn.Linear) == False and isinstance(layer, nn.AdaptiveAvgPool2d) == False:
+                if isinstance(layer, nn.Linear) == False:
                     encoder.add_module(str(idx), layer)
         elif backbone.startswith('vgg'):
             encoder=pretrained_net.features

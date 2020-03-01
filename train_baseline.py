@@ -31,15 +31,19 @@ def compute_valid_loss(model, valid_loader, vocab):
             sample_ids = model.sample(features)
             loss = criterion(outputs, targets)
             losses.append(loss.item())
+
     num_samples = 3
     gt = [''] * num_samples
     preds = [''] * num_samples
     for sample_id in range(num_samples):
         for gt_token_id in captions[sample_id]:
-            gt[sample_id] += vocab.idx2word[gt_token_id]
+            gt[sample_id] += vocab.idx2word[gt_token_id.item()]
+            gt[sample_id] += ' '
 
         for pred_token_id in sample_ids[sample_id]:
-            preds[sample_id] += vocab.idx2word[pred_token_id]            
+            preds[sample_id] += vocab.idx2word[pred_token_id.item()]
+            preds[sample_id] += ' '
+
     print("Ground truth: {}".format(gt))
     print("Predict: {}".format(preds))
     return np.mean(losses)
@@ -84,6 +88,7 @@ class Train:
             training_losses_epoch = []
 
             for i, (images, captions, lengths) in enumerate(self.train_loader):
+                model.train()
                 images = images.to(self.device)
                 captions = captions.to(self.device)
                 targets = pack_padded_sequence(
@@ -97,6 +102,9 @@ class Train:
                 training_losses_epoch.append(loss.item())
                 if i % self.args.log_step == 0:
                     print("Epoch: {}, Iteration: {}, Loss: {}, Perplexity: {}".format(epoch, i, np.exp(loss.item())))
+
+
+
 
             training_loss = np.mean(training_losses_epoch)
             training_losses.append(training_loss)
@@ -128,8 +136,6 @@ class Train:
         with open(self.args.valid_ids_path, 'rb') as f:
             test_ids = js.load(f)['ids']
         return vocab, train_ids, val_ids, test_ids
-
-
 
 
 
