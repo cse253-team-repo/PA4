@@ -31,6 +31,7 @@ def compute_valid_loss(encoder, decoder, valid_loader, vocab):
             sample_ids = decoder.sample(features)
             loss = criterion(outputs, targets)
             losses.append(loss.item())
+            # break
     
     num_samples = 3
     gt = [''] * num_samples
@@ -38,11 +39,13 @@ def compute_valid_loss(encoder, decoder, valid_loader, vocab):
 
     for sample_id in range(num_samples):
         for gt_token_id in captions[sample_id]:
-            gt[sample_id] += vocab.idx2word[gt_token_id]
+            gt[sample_id] += vocab.idx2word[gt_token_id.item()]
+            gt[sample_id] += ' '
 
         for pred_token_id in sample_ids[sample_id]:
-            preds[sample_id] += vocab.idx2word[pred_token_id]
-            
+            preds[sample_id] += vocab.idx2word[pred_token_id.item()]
+            preds[sample_id] += ' '
+
     print("GROUND TRUTH: ", gt)
     print("PREDICTIONS: ", preds)
 
@@ -94,6 +97,9 @@ def main(args):
         training_losses_epoch = []
 
         for i, (images, captions, lengths) in enumerate(train_loader):
+            encoder.train()
+            decoder.train()
+
             images = images.to(device)
             captions = captions.to(device)
             targets = pack_padded_sequence(
@@ -112,6 +118,8 @@ def main(args):
             if i % args.log_step == 0:
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
                       .format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item())))
+                    
+            # break
 
         training_loss = np.mean(training_losses_epoch)
         training_losses.append(training_loss)
@@ -133,6 +141,8 @@ def main(args):
             pickle.dump(training_losses, f1)
         with open(args.model_path + 'valid_losses.txt', 'wb') as f2:
             pickle.dump(valid_losses, f2)
+        
+        # break
 
     print('Loss Values Saved, Training Finished.')
 
