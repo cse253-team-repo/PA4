@@ -183,9 +183,10 @@ class CaptionCNNRNN(nn.Module):
                  args,
                  len_vocab):
         super(CaptionCNNRNN, self).__init__()
-        self.encoder = EncoderCNN(args.embed_size)
-        self.decoder = DecoderRNN(args.embed_size, args.hidden_size,
+        self.encoder = EncoderCNN(args.embedding_size)
+        self.decoder = DecoderRNN(args.embedding_size, args.hidden_size,
                              len_vocab, args.num_layers, use_word2vec=True)
+        self.sample = self.decoder.sample
 
     def forward(self,images,captions, lengths):
         features = self.encoder(images)
