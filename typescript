@@ -1,0 +1,1343 @@
+Script started on 2020-02-29 17:36:53-0800
+[r[m[2J[H[?7h[?1;4;6l[?1049h[22;0;0t[4l[?1h=[0m(B[1;30r[H[2J[H[2J[H[2J
+GNU Screen version 4.06.02 (GNU) 23-Oct-17
+
+Copyright (c) 2015-2017 Juergen Weigert, Alexander Naumov, Amadeusz Slawinski
+Copyright (c) 2010-2014 Juergen Weigert, Sadrul Habib Chowdhury
+Copyright (c) 2008-2009 Juergen Weigert, Michael Schroeder, Micah Cowan, Sadrul Habib Chowdhury
+Copyright (c) 1993-2007 Juergen Weigert, Michael Schroeder
+Copyright (c) 1987 Oliver Laumann
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation; either version 3, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program (see the file COPYING); if
+not, see http://www.gnu.org/licenses/, or contact Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA  02111-1301  USA.
+
+Send bugreports, fixes, enhancements, t-shirts, money, beer & pizza to screen-devel@gnu.org
+
+
+Capabilities:
++copy +remote-detach +power-detach +multi-attach +multi-user +font +color-256 +utf8 +rxvt +builtin-telnet[29;45H[Press Space or Return to end.]
+[H[2Jcs253wi20ae@cs253wi20ae-15504:~/PA4$ ls
+baseline.py[5C     evaluate_captions.py  get_vocab.py [8C[8C[8C      README.txt[8C train.py
+caption_to_image.py  get_datasets.ipynb    models[7C[8C[8C[8C      TestImageIds.csv   typescript
+data[4C[8C     get_datasets.py[4C   Programming_Assignment_4_253_Win_2020.pdf  train_baseline.py
+data_loader.py       get_ids.py [8C   __pycache__  [8C[8C[8C      TrainImageIds.csv
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ python train_baseline.py
+loading annotations into memory...
+Done (t=0.92s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=1.22s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.39s)
+creating index...
+index created!
+Epoch [0/50], Step [0/518], Loss: 8.6770, Perplexity: 5866.2533
+^CTraceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 99, in main
+    for i, (images, captions, lengths) in enumerate(train_loader):
+KeyboardInterrupt
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ ls
+baseline.py[5C     evaluate_captions.py  get_vocab.py [8C[8C[8C      README.txt[8C train.py
+caption_to_image.py  get_datasets.ipynb    models[7C[8C[8C[8C      TestImageIds.csv   typescript
+data[4C[8C     get_datasets.py[4C   Programming_Assignment_4_253_Win_2020.pdf  train_baseline.py
+data_loader.py       get_ids.py [8C   __pycache__  [8C[8C[8C      TrainImageIds.csv
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ cd[K[Knano py[K[Ktrain_baselinel[K.py
+[H[?25l[H[2J[28;53H[7m[ Reading File ][0m[17D[7m[ Read 186 lines ][0m[H[7m  GNU nano 2.9.3                                      train_baseline.py                                                 [1;119H[0m[28B[7m^G[0m Get Help    [7m^O[0m Write Out   [7m^W[0m Where Is    [7m^K[0m Cut Text    [7m^J[0m Justify     [7m^C[0m Cur Pos     [7mM-U[0m Undo[7C[7mM-A[0m Mark Text
+[7m^X[0m Exit[8C[7m^R[0m Read File   [7m^\[0m Replace     [7m^U[0m Uncut Text  [7m^T[0m To Linter   [7m^_[0m Go To Line  [7mM-E[0m Redo[7C[7mM-6[0m Copy Text[A[A[25A[1m[36mimport[39m[0m argparse
+[1m[36mimport[39m[0m torch
+[1m[36mimport[39m[0m torch.nn [1m[36mas[39m[0m nn
+[1m[36mimport[39m[0m numpy [1m[36mas[39m[0m np
+[1m[36mimport[39m[0m os
+[1m[36mimport[39m[0m pickle
+[1m[36mimport[39m[0m json [1m[36mas[39m[0m js
+[1m[36mfrom[39m[0m data_loader [1m[36mimport[39m[0m get_loader
+[1m[36mfrom[39m[0m get_vocab [1m[36mimport[39m[0m Vocabulary
+[1m[36mfrom[39m[0m baseline [1m[36mimport[39m[0m *
+[1m[36mfrom[39m[0m torch.nn.utils.rnn [1m[36mimport[39m[0m pack_padded_sequence
+[1m[36mfrom[39m[0m torchvision [1m[36mimport[39m[0m transforms
+
+
+device = torch.device([1m[32m'cuda'[39m[0m [1m[36mif[39m[0m torch.cuda.is_available() [1m[36melse[39m[0m [1m[32m'cpu'[39m[0m)
+
+
+[1m[36mdef[34m compute_valid_loss[39m[0m(encoder, decoder, valid_loader, vocab):[58D
+encoder.eval()[14D
+decoder.eval()[14D
+criterion = nn.CrossEntropyLoss()[33D
+losses = [][11D
+[1m[36mwith[39m[0m torch.no_grad():[17D
+[1m[36mfor[39m[0m i, (images, captions, lengths) [1m[36min[39m[0m enumerate(valid_loader):[58D
+images = images.to(device)[24A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B[2;27r[2;1H[13M[25B[H[15;13Hcaptions = captions.to(device)[30D
+targets = pack_padded_sequence([27D
+captions, lengths, batch_first=[1m[35mTrue[39m[0m)[0][43D
+features = encoder(images)[26D
+outputs = decoder(features, captions, lengths)[46D
+sample_ids = decoder.sample(features)[37D
+loss = criterion(outputs, targets)[34D
+losses.append(loss.item())[27D
+[1m[31m # break
+[0m[42m    
+[49mnum_samples = 3[15D
+gt = [''] * num_samples[23D
+preds = [''] * num_samples[12A[?12l[?25h[?25l[28;1H[K[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B[28;1H[2;28r[2;1H[13M[26B[H
+[K[16;5H[1m[36mfor[39m[0m sample_id [1m[36min[39m[0m range(num_samples):[32D
+[1m[36mfor[39m[0m gt_token_id [1m[36min[39m[0m captions[sample_id]:[35D
+gt[sample_id] += vocab.idx2word[gt_token_id.item()][51D
+gt[sample_id] += [1m[32m' '[21;9H[36mfor[39m[0m pred_token_id [1m[36min[39m[0m sample_ids[sample_id]:[39D
+preds[sample_id] += vocab.idx2word[pred_token_id.item()][56D
+preds[sample_id] += [1m[32m' '[25;5H[36mprint[39m[0m([1m[32m"GROUND TRUTH: "[39m[0m, gt)[27D
+[1m[36mprint[39m[0m([1m[32m"PREDICTIONS: "[39m[0m, preds)[11A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[26A[13M[26B[H[15;5H[1m[36mreturn[39m[0m np.mean(losses)
+
+
+[1m[36mdef[34m main[39m[0m(args):[11D
+[1m[36mif[39m[0m [1m[36mnot[39m[0m os.path.exists(args.model_path):[35D
+os.mkdir(args.model_path)[22;5Htransform = transforms.Compose([[28D
+transforms.RandomCrop(args.crop_size),[38D
+transforms.ToTensor(),[22D
+transforms.Normalize((0.485, 0.456, 0.406),[22D
+(0.229, 0.224, 0.225))])[11A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;5H[1m[36mwith[39m[0m open(args.vocab_path, [1m[32m'rb'[39m[0m) [1m[36mas[39m[0m f:[34D
+vocab = pickle.load(f)[18;5H[1m[36mwith[39m[0m open(args.ids_path, [1m[32m'rb'[39m[0m) [1m[36mas[39m[0m f:[32D
+dic = js.load(f)[16D
+train_ids = dic[[1m[32m'ids_train'[39m[0m][28D
+val_ids = dic[[1m[32m'ids_val'[39m[0m][23;5H[1m[36mwith[39m[0m open(args.valid_ids_path, [1m[32m'rb'[39m[0m) [1m[36mas[39m[0m f:[38D
+test_ids = js.load(f)[[1m[32m'ids'[39m[0m][26;5Htrain_loader = get_loader(args.image_dir, args.caption_path, train_ids, vocab,[53D
+transform, args.batch_size, shuffle=[1m[35mFalse[39m[0m, num_workers=args.num_workers)[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[26A[13M[26B[H
+[K[13B[42m    
+[49mvalid_loader = get_loader(args.image_dir, args.caption_path, val_ids, vocab,[51D
+transform, args.batch_size, shuffle=[1m[35mFalse[39m[0m, num_workers=args.num_workers)[19;5Htest_loader = get_loader(args.valid_image_dir, args.valid_caption_path, test_ids,[55D
+vocab, transform, args.batch_size, shuffle=[1m[35mFalse[39m[0m, num_workers=args.num_workers)[22;5Hencoder = EncoderCNN(args.embedding_size).to(device)[52D
+decoder = DecoderRNN(args.embedding_size, args.hidden_size,[37D
+len(vocab), args.num_layers).to(device)[26;5Hcriterion = nn.CrossEntropyLoss()[33D
+params = list(encoder.parameters()) + list(decoder.parameters())[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[26A[13M[26B[H
+[K[15;5Hoptimizer = torch.optim.Adam(params, lr=args.learning_rate)[17;5Htotal_step = len(train_loader)[30D
+training_losses = [][20D
+valid_losses = [][17D
+[1m[36mfor[39m[0m epoch [1m[36min[39m[0m range(args.num_epochs):[32D
+training_losses_epoch = [][23;9H[1m[36mfor[39m[0m i, (images, captions, lengths) [1m[36min[39m[0m enumerate(train_loader):[58D
+encoder.train()[15D
+decoder.train()[15D
+
+images = images.to(device)[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25lc[?12l[?25h[?25lr[?12l[?25h[?25li[?12l[?25h[?25lt[?12l[?25h[?25le[?12l[?25h[?25lr[?12l[?25h[?25li[?12l[?25h[?25lo[?12l[?25h[?25ln[?12l[?25h[?25l [?12l[?25h[?25l=[?12l[?25h[?25l [?12l[?25h[?25ln[?12l[?25h[?25ln[?12l[?25h[?25l.[?12l[?25h[?25lC[?12l[?25h[?25lr[?12l[?25h[?25lo[?12l[?25h[?25ls[?12l[?25h[?25ls[?12l[?25h[?25lE[?12l[?25h[?25ln[?12l[?25h[?25lt[?12l[?25h[?25lr[?12l[?25h[?25lo[?12l[?25h[?25lp[?12l[?25h[?25ly[?12l[?25h[?25lL[?12l[?25h[?25lo[?12l[?25h[?25ls[?12l[?25h[?25ls[?12l[?25h[?25l([?12l[?25h[?25l)[?12l[?25h[?25l
+[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25lp[?12l[?25h[?25la[?12l[?25h[?25lr[?12l[?25h[?25la[?12l[?25h[?25lm[?12l[?25h[?25ls[?12l[?25h[?25l [?12l[?25h[?25l=[?12l[?25h[?25l [?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[11;14H[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25ll[?12l[?25h[?25le[?12l[?25h[?25ln[?12l[?25h[?25l([?12l[?25h[?25lv[?12l[?25h[?25lo[?12l[?25h[?25lc[?12l[?25h[?25la[?12l[?25h[?25lb[?12l[?25h[?25l)[?12l[?25h[?25l,[?12l[?25h[?25l [?12l[?25h[?25la[?12l[?25h[?25lr[?12l[?25h[?25lg[?12l[?25h[?25ls[?12l[?25h[?25l.[?12l[?25h[?25ln[?12l[?25h[?25lu[?12l[?25h[?25lm[?12l[?25h[?25l_[?12l[?25h[?25ll[?12l[?25h[?25la[?12l[?25h[?25ly[?12l[?25h[?25le[?12l[?25h[?25lr[?12l[?25h[?25ls[?12l[?25h[?25l[1;111H[7mModified[0m[11;54H,).to(device)[12D[?12l[?25h[?25l ).to(device)[12D[?12l[?25h[?25lu).to(device)[12D[?12l[?25h[?25ls).to(device)[12D[?12l[?25h[?25le).to(device)[12D[?12l[?25h[?25l_).to(device)[12D[?12l[?25h[?25lw).to(device)[12D[?12l[?25h[?25lo).to(device)[12D[?12l[?25h[?25lr).to(device)[12D[?12l[?25h[?25ld).to(device)[12D[?12l[?25h[?25l2).to(device)[12D[?12l[?25h[?25lv).to(device)[12D[?12l[?25h[?25le).to(device)[12D[?12l[?25h[?25lc).to(device)[12D[?12l[?25h[?25l=).to(device)[12D[?12l[?25h[?25lT).to(device)[12D[?12l[?25h[?25lr).to(device)[12D[?12l[?25h[?25lu).to(device)[12D[?12l[?25h[?25l[1m[35mTrue[39m[0m).to(device)[12D[?12l[?25h[?25l[17B[7mSave modified buffer?  (Answering "No" will DISCARD changes.)                                                           [29;1H Y[0m Yes[K[30;1H[7m N[0m No  [8C [7m^C[0m Cancel[K[28;63H[?12l[?25h[?25l[29;1H[7m^G[0m Get Help[19C[7mM-D[0m DOS Format[16C[7mM-A[0m Append[20C[7mM-B[0m Backup File[30;1H[7m^C[0m Cancel[7C              [7mM-M[0m Mac Format[16C[7mM-P[0m Prepend[19C[7m^T[0m To Files[A[A[7mFile Name to Write: train_baseline.py                        [0m[37C[?12l[?25h[?25l[K[1;119H[8D[7m        [0m[28;51H[7m[ Wrote 186 lines ][0m[J[30;120H[?12l[?25hcs253wi20ae@cs253wi20ae-15504:~/PA4$ nano train_baseline.pyls[Kpython train_baseline.py[1;30r[30;1H
+loading annotations into memory...
+Done (t=0.76s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=1.15s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.50s)
+creating index...
+index created!
+Traceback (most recent call last):
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 130, in __init__
+    self.embedding = nn.Embedding.from_pretrained(w2v.wv)
+  File "/opt/conda/lib/python3.7/site-packages/torch/nn/modules/sparse.py", line 157, in from_pretrained
+    assert embeddings.dim() == 2, \
+AttributeError: 'Word2VecKeyedVectors' object has no attribute 'dim'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 87, in main
+    len(vocab), args.num_layers, use_word2vec=True).to(device)
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 134, in __init__
+    raise NotImplementedError
+NotImplementedError
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ nano t[Kbaseline.py
+[H[?25l[H[2J[28;53H[7m[ Reading File ][0m[17D[7m[ Read 197 lines ][0m[H[7m  GNU nano 2.9.3                                         baseline.py                                                    [1;119H[0m[28B[7m^G[0m Get Help    [7m^O[0m Write Out   [7m^W[0m Where Is    [7m^K[0m Cut Text    [7m^J[0m Justify     [7m^C[0m Cur Pos     [7mM-U[0m Undo[7C[7mM-A[0m Mark Text
+[7m^X[0m Exit[8C[7m^R[0m Read File   [7m^\[0m Replace     [7m^U[0m Uncut Text  [7m^T[0m To Linter   [7m^_[0m Go To Line  [7mM-E[0m Redo[7C[7mM-6[0m Copy Text[A[A[25A[1m[36mimport[39m[0m torch
+[1m[36mimport[39m[0m torch.nn [1m[36mas[39m[0m nn
+[1m[36mimport[39m[0m torchvision.models [1m[36mas[39m[0m models
+[1m[36mfrom[39m[0m torch.nn.utils.rnn [1m[36mimport[39m[0m pack_padded_sequence
+[1m[36mfrom[39m[0m torch.utils.data [1m[36mimport[39m[0m WeightedRandomSampler
+[1m[36mfrom[39m[0m torch.autograd [1m[36mimport[39m[0m Variable
+[1m[36mfrom[39m[0m gensim.models [1m[36mimport[39m[0m Word2Vec
+[1m[36mimport[39m[0m numpy [1m[36mas[39m[0m np
+
+
+[1m[36mclass[39m[0m EncoderCNN(nn.Module):[24D
+[1m[36mdef[34m __init__[39m[0m(self, embedding_size):[31D
+super(EncoderCNN, self).__init__()[34D
+self.resnet = self.load_encoder()[33D
+self.linear = nn.Linear(self.infeature, embedding_size)[55D
+self.bn = nn.BatchNorm1d(embedding_size, momentum=0.01)[20;5H[1m[36mdef[34m load_encoder[39m[0m(self, backbone=[1m[32m'resnet50'[39m[0m):[40D
+pretrained_net = models.resnet50(pretrained=[1m[35mTrue[39m[0m)[49D
+self.infeature= pretrained_net.fc.in_features[45D
+encoder = nn.Sequential()[25;9H[1m[36mif[39m[0m backbone.startswith([1m[32m'res'[39m[0m):[26D
+[1m[36mfor[39m[0m idx, layer [1m[36min[39m[0m enumerate(pretrained_net.children()):[52D
+[1m[31m # Change the first conv and last linear layer[24A[39m[0m[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B[3;27r[3;1H[13M[24B[H[15;17H[1m[36mif[39m[0m isinstance(layer, nn.Linear) == [1m[35mFalse[39m[0m:[37D
+encoder.add_module(str(idx), layer)[47D
+[1m[36melif[39m[0m backbone.startswith([1m[32m'vgg'[39m[0m):[28D
+encoder=pretrained_net.features[35D
+[1m[36mreturn[39m[0m encoder[21;5H[1m[36mdef[34m forward[39m[0m(self, images):[22D
+[1m[36mwith[39m[0m torch.no_grad():[17D
+features = self.resnet(images)[34D
+features = features.reshape(features.size(0), -1)[49D
+features = self.linear(features)[32D
+features = self.bn(features)[11A[?12l[?25h[?25l[28;1H[K[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+
+[?12l[?25h[?25l[H[28;1H[3;28r[3;1H[13M[25B[H[15;9H[1m[36mreturn[39m[0m features
+
+
+[1m[36mclass[39m[0m DecoderLSTM(nn.Module):[25D
+[1m[36mdef[34m __init__[39m[0m(self,[5D
+embedding_size,[15D
+hidden_size,[12D
+vocab_size,[11D
+num_layers,[11D
+use_word2vec=[1m[35mFalse[39m[0m):[29D
+super(DecoderLSTM, self).__init__()[27;9H[1m[36mif[39m[0m use_word2vec == [1m[35mTrue[39m[0m:[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;13H[1m[36mtry[39m[0m:
+w2v = Word2Vec.load([16D
+[1m[32m'./data/w2v_'[39m[0m + str(embedding_size) + [1m[32m'.model'[39m[0m)[51D
+self.embedding = nn.Embedding.from_pretrained(w2v.wv)[53D
+[1m[36mfor[39m[0m param [1m[36min[39m[0m self.embedding.parameters():[37D
+param.requires_grad = [1m[35mFalse[35D
+[36mexcept[39m[0m:
+[1m[36mraise[39m[0m NotImplementedError[33D
+[1m[36melse[39m[0m:
+self.embedding = nn.Embedding(vocab_size, embedding_size)[26;9Hself.lstm = nn.LSTM(embedding_size, hidden_size,[28D
+num_layers, batch_first=[1m[35mTrue[39m[0m)[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;9Hself.linear = nn.Linear(hidden_size, vocab_size)[48D
+self.max_length = 99 [1m[31m # max_length[18;5H[36mdef[34m forward[39m[0m(self, features, captions, lengths, states=[1m[35mNone[39m[0m):[56D
+hiddens = [][12D
+embeddings = self.embedding(captions)[37D
+embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)[62D
+packed = pack_padded_sequence(embeddings, lengths, batch_first=[1m[35mTrue[39m[0m)[24;9Hinputs_iter = packed[0][23D
+batch_size_iter = packed[1][27;8H[1m[31m # for i in range(max(lengths)):[12A[39m[0m[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;8H[1m[31m # for i in range(len(packed)):[31D
+ #     # hidden, states = self.lstm(embeddings[:,i].unsqueeze(1), states)[73D
+ #     print("hidden shape: ", hidden.shape)[44D
+ #     hiddens.append(hidden)[29D
+ # hiddens = torch.cat(hiddens,dim=1)[37D
+ # print("hiddens shape: ", hiddens.shape)[42D
+ # hiddens = Variable(hiddens, requires_grad=[35mTrue[31m)[23;9H[39m[0mhiddens, _ = self.lstm(packed)[30D
+outputs = self.linear(hiddens[0])[33D
+[1m[36mreturn[39m[0m outputs[27;5H[1m[36mdef[34m sample[39m[0m(self,[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;16Hfeatures,[9D
+states=[1m[35mNone[39m[0m,[12D
+stochastic=[1m[35mFalse[39m[0m,[17D
+temperature=1):[22D
+sampled_ids = [][16D
+inputs = features.unsqueeze(1)[22;9H[1m[36mfor[39m[0m i [1m[36min[39m[0m range(self.max_length):[28D
+hiddens, states = self.lstm(inputs, states)[43D
+outputs = self.linear(hiddens.squeeze(1))[41D
+
+[1m[36mif[39m[0m stochastic == [1m[35mTrue[39m[0m:[18D
+outputs = outputs / temperature[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;17Hpredicted = WeightedRandomSampler([30D
+torch.nn.functional.softmax(outputs, dim=2), outputs.shape[2])[70D
+[1m[36melse[39m[0m:
+_, predicted = outputs.max(1)[33D
+
+sampled_ids.append(predicted)[29D
+inputs = self.embedding(predicted)[34D
+inputs = inputs.unsqueeze(1)[24;9Hsampled_ids = torch.stack(sampled_ids, 1)[41D
+[1m[36mreturn[39m[0m sampled_ids[10A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[14B[1m[36mclass[39m[0m DecoderRNN(nn.Module):[24D
+[1m[36mdef[34m __init__[39m[0m(self,[5D
+embedding_size,[15D
+hidden_size,[12D
+vocab_size,[11D
+num_layers,[11D
+use_word2vec=[1m[35mFalse[39m[0m):[29D
+super(DecoderRNN, self).__init__()[24;9H[1m[36mif[39m[0m use_word2vec == [1m[35mTrue[39m[0m:[20D
+[1m[36mtry[39m[0m:
+w2v = Word2Vec.load([16D
+[1m[32m'./data/w2v_'[39m[0m + str(embedding_size) + [1m[32m'.model'[39m[0m)[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;17Hself.embedding = nn.Embedding.from_pretrained(w2v.wv)[53D
+[1m[36mfor[39m[0m param [1m[36min[39m[0m self.embedding.parameters():[37D
+param.requires_grad = [1m[35mFalse[35D
+[36mexcept[39m[0m:
+[1m[36mraise[39m[0m NotImplementedError[33D
+[1m[36melse[39m[0m:
+self.embedding = nn.Embedding(vocab_size, embedding_size)[23;9Hself.rnn = nn.RNN(embedding_size, hidden_size,[28D
+num_layers, batch_first=[1m[35mTrue[39m[0m)[47D
+self.linear = nn.Linear(hidden_size, vocab_size)[48D
+self.max_length = 99 [1m[31m # max_length[11A[39m[0m[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25ls[?12l[?25h[?25le[?12l[?25h[?25ll[?12l[?25h[?25lf[?12l[?25h[?25l.[?12l[?25h[?25le[?12l[?25h[?25lm[?12l[?25h[?25lb[?12l[?25h[?25le[?12l[?25h[?25ld[?12l[?25h[?25ld[?12l[?25h[?25li[?12l[?25h[?25ln[?12l[?25h[?25lg[?12l[?25h[?25l [?12l[?25h[?25l=[?12l[?25h[?25l [?12l[?25h[?25ln[?12l[?25h[?25ln[?12l[?25h[?25l.[?12l[?25h[?25lE[?12l[?25h[?25lm[?12l[?25h[?25lb[?12l[?25h[?25le[?12l[?25h[?25ld[?12l[?25h[?25ld[?12l[?25h[?25li[?12l[?25h[?25ln[?12l[?25h[?25lg[?12l[?25h[?25l.[?12l[?25h[?25lf[?12l[?25h[?25lr[?12l[?25h[?25lo[?12l[?25h[?25lm[?12l[?25h[?25l_[?12l[?25h[?25lp[?12l[?25h[?25lr[?12l[?25h[?25le[?12l[?25h[?25lt[?12l[?25h[?25lr[?12l[?25h[?25la[?12l[?25h[?25li[?12l[?25h[?25ln[?12l[?25h[?25le[?12l[?25h[?25ld[?12l[?25h[?25l([?12l[?25h[?25lw[?12l[?25h[?25l2[?12l[?25h[?25lv[?12l[?25h[?25l.[?12l[?25h[?25lw[?12l[?25h[?25lv[?12l[?25h[?25l[1;111H[7mModified[0m[15;68H)[K[?12l[?25h[?25l)[K[?12l[?25h[?25l)[K[?12l[?25h[?25l[A[?12l[?25h[?25l[13;37H[?12l[?25h[?25l[12;17H[?12l[?25h[?25l[11;33H[?12l[?25h[?25l[A[?12l[?25h[?25l[9;43H[?12l[?25h[?25l[A[5D[?12l[?25h[?25l[7;29H[?12l[?25h[?25l[A[?12l[?25h[?25l[A,[?12l[?25h[?25l[Aze,[?12l[?25h[?25l[3;23H[?12l[?25h[?25l[H
+[2;27r[2;1H[13L[H[3;21Htorch.nn.functional.softmax(outputs, dim=2), outputs.shape[2])[70D
+[1m[36melse[39m[0m:
+_, predicted = outputs.max(1)[7;13Hsampled_ids.append(predicted)[29D
+inputs = self.embedding(predicted)[34D
+inputs = inputs.unsqueeze(1)[11;9Hsampled_ids = torch.stack(sampled_ids, 1)[41D
+[1m[36mreturn[39m[0m sampled_ids
+
+
+[1m[36mclass[39m[0m DecoderRNN(nn.Module):[?12l[?25h[?25l[A[?12l[?25h[?25l[28;1H[7mSave modified buffer?  (Answering "No" will DISCARD changes.)                                                           [29;1H Y[0m Yes[K[30;1H[7m N[0m No  [8C [7m^C[0m Cancel[K[28;63H[?12l[?25h[?25l[29;1H[7m^G[0m Get Help[19C[7mM-D[0m DOS Format[16C[7mM-A[0m Append[20C[7mM-B[0m Backup File[30;1H[7m^C[0m Cancel[7C              [7mM-M[0m Mac Format[16C[7mM-P[0m Prepend[19C[7m^T[0m To Files[A[A[7mFile Name to Write: baseline.py                              [0m[31C[?12l[?25h[?25l[K[1;119H[8D[7m        [0m[28;51H[7m[ Wrote 197 lines ][0m[J[30;120H[?12l[?25hcs253wi20ae@cs253wi20ae-15504:~/PA4$ nano baseline.pypython train_baseline.py[1;30r[30;1H
+loading annotations into memory...
+Done (t=0.85s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.95s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.54s)
+creating index...
+index created!
+Traceback (most recent call last):
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 130, in __init__
+    self.embedding = nn.Embedding.from_pretrained(w2v)
+  File "/opt/conda/lib/python3.7/site-packages/torch/nn/modules/sparse.py", line 157, in from_pretrained
+    assert embeddings.dim() == 2, \
+AttributeError: 'Word2Vec' object has no attribute 'dim'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 87, in main
+    len(vocab), args.num_layers, use_word2vec=True).to(device)
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 134, in __init__
+    raise NotImplementedError
+NotImplementedError
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ python train_baseline.py[8Pnano baseline.py
+[H[?25l[H[2J[28;53H[7m[ Reading File ][0m[17D[7m[ Read 197 lines ][0m[H[7m  GNU nano 2.9.3                                         baseline.py                                                    [1;119H[0m[28B[7m^G[0m Get Help    [7m^O[0m Write Out   [7m^W[0m Where Is    [7m^K[0m Cut Text    [7m^J[0m Justify     [7m^C[0m Cur Pos     [7mM-U[0m Undo[7C[7mM-A[0m Mark Text
+[7m^X[0m Exit[8C[7m^R[0m Read File   [7m^\[0m Replace     [7m^U[0m Uncut Text  [7m^T[0m To Linter   [7m^_[0m Go To Line  [7mM-E[0m Redo[7C[7mM-6[0m Copy Text[A[A[25A[1m[36mimport[39m[0m torch
+[1m[36mimport[39m[0m torch.nn [1m[36mas[39m[0m nn
+[1m[36mimport[39m[0m torchvision.models [1m[36mas[39m[0m models
+[1m[36mfrom[39m[0m torch.nn.utils.rnn [1m[36mimport[39m[0m pack_padded_sequence
+[1m[36mfrom[39m[0m torch.utils.data [1m[36mimport[39m[0m WeightedRandomSampler
+[1m[36mfrom[39m[0m torch.autograd [1m[36mimport[39m[0m Variable
+[1m[36mfrom[39m[0m gensim.models [1m[36mimport[39m[0m Word2Vec
+[1m[36mimport[39m[0m numpy [1m[36mas[39m[0m np
+
+
+[1m[36mclass[39m[0m EncoderCNN(nn.Module):[24D
+[1m[36mdef[34m __init__[39m[0m(self, embedding_size):[31D
+super(EncoderCNN, self).__init__()[34D
+self.resnet = self.load_encoder()[33D
+self.linear = nn.Linear(self.infeature, embedding_size)[55D
+self.bn = nn.BatchNorm1d(embedding_size, momentum=0.01)[20;5H[1m[36mdef[34m load_encoder[39m[0m(self, backbone=[1m[32m'resnet50'[39m[0m):[40D
+pretrained_net = models.resnet50(pretrained=[1m[35mTrue[39m[0m)[49D
+self.infeature= pretrained_net.fc.in_features[45D
+encoder = nn.Sequential()[25;9H[1m[36mif[39m[0m backbone.startswith([1m[32m'res'[39m[0m):[26D
+[1m[36mfor[39m[0m idx, layer [1m[36min[39m[0m enumerate(pretrained_net.children()):[52D
+[1m[31m # Change the first conv and last linear layer[24A[39m[0m[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B[3;27r[3;1H[13M[24B[H[15;17H[1m[36mif[39m[0m isinstance(layer, nn.Linear) == [1m[35mFalse[39m[0m:[37D
+encoder.add_module(str(idx), layer)[47D
+[1m[36melif[39m[0m backbone.startswith([1m[32m'vgg'[39m[0m):[28D
+encoder=pretrained_net.features[35D
+[1m[36mreturn[39m[0m encoder[21;5H[1m[36mdef[34m forward[39m[0m(self, images):[22D
+[1m[36mwith[39m[0m torch.no_grad():[17D
+features = self.resnet(images)[34D
+features = features.reshape(features.size(0), -1)[49D
+features = self.linear(features)[32D
+features = self.bn(features)[11A[?12l[?25h[?25l[28;1H[K[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B[28;1H[3;28r[3;1H[13M[25B[H[15;9H[1m[36mreturn[39m[0m features
+
+
+[1m[36mclass[39m[0m DecoderLSTM(nn.Module):[25D
+[1m[36mdef[34m __init__[39m[0m(self,[5D
+embedding_size,[15D
+hidden_size,[12D
+vocab_size,[11D
+num_layers,[11D
+use_word2vec=[1m[35mFalse[39m[0m):[29D
+super(DecoderLSTM, self).__init__()[27;9H[1m[36mif[39m[0m use_word2vec == [1m[35mTrue[39m[0m:[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;13H[1m[36mtry[39m[0m:
+w2v = Word2Vec.load([16D
+[1m[32m'./data/w2v_'[39m[0m + str(embedding_size) + [1m[32m'.model'[39m[0m)[51D
+self.embedding = nn.Embedding.from_pretrained(w2v.wv)[53D
+[1m[36mfor[39m[0m param [1m[36min[39m[0m self.embedding.parameters():[37D
+param.requires_grad = [1m[35mFalse[35D
+[36mexcept[39m[0m:
+[1m[36mraise[39m[0m NotImplementedError[33D
+[1m[36melse[39m[0m:
+self.embedding = nn.Embedding(vocab_size, embedding_size)[26;9Hself.lstm = nn.LSTM(embedding_size, hidden_size,[28D
+num_layers, batch_first=[1m[35mTrue[39m[0m)[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;9Hself.linear = nn.Linear(hidden_size, vocab_size)[48D
+self.max_length = 99 [1m[31m # max_length[18;5H[36mdef[34m forward[39m[0m(self, features, captions, lengths, states=[1m[35mNone[39m[0m):[56D
+hiddens = [][12D
+embeddings = self.embedding(captions)[37D
+embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)[62D
+packed = pack_padded_sequence(embeddings, lengths, batch_first=[1m[35mTrue[39m[0m)[24;9Hinputs_iter = packed[0][23D
+batch_size_iter = packed[1][27;8H[1m[31m # for i in range(max(lengths)):[12A[39m[0m[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;8H[1m[31m # for i in range(len(packed)):[31D
+ #     # hidden, states = self.lstm(embeddings[:,i].unsqueeze(1), states)[73D
+ #     print("hidden shape: ", hidden.shape)[44D
+ #     hiddens.append(hidden)[29D
+ # hiddens = torch.cat(hiddens,dim=1)[37D
+ # print("hiddens shape: ", hiddens.shape)[42D
+ # hiddens = Variable(hiddens, requires_grad=[35mTrue[31m)[23;9H[39m[0mhiddens, _ = self.lstm(packed)[30D
+outputs = self.linear(hiddens[0])[33D
+[1m[36mreturn[39m[0m outputs[27;5H[1m[36mdef[34m sample[39m[0m(self,[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25lp[?12l[?25h[?25la[?12l[?25h[?25l
+[?12l[?25h[?25l[10C
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[10C
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[10C
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[10C
+[?12l[?25h[?25l[H[27;11H
+[25A[13M[25B[H[15;16Hfeatures,[9D
+states=[1m[35mNone[39m[0m,[12D
+stochastic=[1m[35mFalse[39m[0m,[17D
+temperature=1):[22D
+sampled_ids = [][16D
+inputs = features.unsqueeze(1)[22;9H[1m[36mfor[39m[0m i [1m[36min[39m[0m range(self.max_length):[28D
+hiddens, states = self.lstm(inputs, states)[43D
+outputs = self.linear(hiddens.squeeze(1))[41D
+
+[1m[36mif[39m[0m stochastic == [1m[35mTrue[39m[0m:[18D
+outputs = outputs / temperature[15;11H[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[10C
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[10C
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[27;11H
+[25A[13M[25B[H[15;17Hpredicted = WeightedRandomSampler([30D
+torch.nn.functional.softmax(outputs, dim=2), outputs.shape[2])[70D
+[1m[36melse[39m[0m:
+_, predicted = outputs.max(1)[33D
+
+sampled_ids.append(predicted)[29D
+inputs = self.embedding(predicted)[34D
+inputs = inputs.unsqueeze(1)[24;9Hsampled_ids = torch.stack(sampled_ids, 1)[41D
+[1m[36mreturn[39m[0m sampled_ids[15;11H[?12l[?25h[?25l
+[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[17C
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[17C
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[17C
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[14B[1m[36mclass[39m[0m DecoderRNN(nn.Module):[24D
+[1m[36mdef[34m __init__[39m[0m(self,[5D
+embedding_size,[15D
+hidden_size,[12D
+vocab_size,[11D
+num_layers,[11D
+use_word2vec=[1m[35mFalse[39m[0m):[29D
+super(DecoderRNN, self).__init__()[24;9H[1m[36mif[39m[0m use_word2vec == [1m[35mTrue[39m[0m:[20D
+[1m[36mtry[39m[0m:
+w2v = Word2Vec.load([16D
+[1m[32m'./data/w2v_'[39m[0m + str(embedding_size) + [1m[32m'.model'[39m[0m)[15;18H[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[17C
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+w[?12l[?25h[?25l
+[?12l[?25h[?25l[H[27;18H
+[25A[13M[25B[H[15;17Hself.embedding = nn.Embedding.from_pretrained(w2v)[50D
+[1m[36mfor[39m[0m param [1m[36min[39m[0m self.embedding.parameters():[37D
+param.requires_grad = [1m[35mFalse[35D
+[36mexcept[39m[0m:
+[1m[36mraise[39m[0m NotImplementedError[33D
+[1m[36melse[39m[0m:
+self.embedding = nn.Embedding(vocab_size, embedding_size)[23;9Hself.rnn = nn.RNN(embedding_size, hidden_size,[28D
+num_layers, batch_first=[1m[35mTrue[39m[0m)[47D
+self.linear = nn.Linear(hidden_size, vocab_size)[48D
+self.max_length = 99 [1m[31m # max_length[15;18H[39m[0m[?12l[?25h[?25l
+[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l [?12l[?25h[?25lp[?12l[?25h[?25la[?12l[?25h[?25lr[?12l[?25h[?25la[?12l[?25h[?25lm[?12l[?25h[?25l [?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l [?12l[?25h[?25ls[?12l[?25h[?25le[?12l[?25h[?25ll[?12l[?25h[?25lf[?12l[?25h[?25l.[?12l[?25h[?25le[?12l[?25h[?25lm[?12l[?25h[?25lb[?12l[?25h[?25le[?12l[?25h[?25ld[?12l[?25h[?25ld[?12l[?25h[?25li[?12l[?25h[?25ln[?12l[?25h[?25lg[?12l[?25h[?25l.[?12l[?25h[?25lp[?12l[?25h[?25la[?12l[?25h[?25lr[?12l[?25h[?25la[?12l[?25h[?25lm[?12l[?25h[?25l
+[?12l[?25h[?25l[1;111H[7mModified[0m[17B[L[H[17B[?12l[?25h[?25l[H[17B[18;27r[18;1HM[H[18B[?12l[?25h[?25l[H[17BM[H[19B[?12l[?25h[?25l[H[28;1H[18;28r[28;1H
+[H[27;9Hself.linear = nn.Linear(hidden_size, vocab_size)[8A[?12l[?25h[?25l[H[27B
+[H[27;9Hself.max_length = 99 [1m[31m # max_length[9A[39m[0m[?12l[?25h[?25l[H[27B
+[H[17;48H[?12l[?25h[?25l[5DFals [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[42m [49m [?12l[?25h[?25l [?12l[?25h[?25l[42m [49m [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[42m                    [49m [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[7D[K[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[K[?12l[?25h[?25l[H[27B[17;28r[28;1H
+[H[27;5H[1m[36mdef[34m forward[39m[0m(self,[16;58H[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[42m [49m [?12l[?25h[?25l [?12l[?25h[?25li [?12l[?25h[?25l[42m [49m [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[42m [49m [?12l[?25h[?25l [?12l[?25h[?25lfo [?12l[?25h[?25l [?12l[?25h[?25l[42m                [49m [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[K[?12l[?25h[?25l[H[27B[16;28r[28;1H
+[H[27;17Hfeatures,[15;67H[?12l[?25h[?25l[?12l[?25h[?25l.)[?12l[?25h[?25lw)[?12l[?25h[?25ln)[?12l[?25h[?25l)[K[?12l[?25h[?25lv)[?12l[?25h[?25l[13B[7mSave modified buffer?  (Answering "No" will DISCARD changes.)                                                           [29;1H Y[0m Yes[K[30;1H[7m N[0m No  [8C [7m^C[0m Cancel[K[28;63H[?12l[?25h[?25l[29;1H[7m^G[0m Get Help[19C[7mM-D[0m DOS Format[16C[7mM-A[0m Append[20C[7mM-B[0m Backup File[30;1H[7m^C[0m Cancel[7C              [7mM-M[0m Mac Format[16C[7mM-P[0m Prepend[19C[7m^T[0m To Files[A[A[7mFile Name to Write: baseline.py                              [0m[31C[?12l[?25h[?25l[K[1;119H[8D[7m        [0m[28;51H[7m[ Wrote 195 lines ][0m[J[30;120H[?12l[?25hcs253wi20ae@cs253wi20ae-15504:~/PA4$ nano baseline.pypython train_baseline.py[1;30r[30;1H
+loading annotations into memory...
+Done (t=0.96s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=1.10s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.42s)
+creating index...
+index created!
+Traceback (most recent call last):
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 130, in __init__
+    self.embedding = nn.Embedding.from_pretrained(w2v.wv)
+  File "/opt/conda/lib/python3.7/site-packages/torch/nn/modules/sparse.py", line 157, in from_pretrained
+    assert embeddings.dim() == 2, \
+AttributeError: 'Word2VecKeyedVectors' object has no attribute 'dim'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 87, in main
+    len(vocab), args.num_layers, use_word2vec=True).to(device)
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 132, in __init__
+    raise NotImplementedError
+NotImplementedError
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ python train_baseline.py[8Pnano baseline.py
+[H[?25l[H[2J[28;53H[7m[ Reading File ][0m[17D[7m[ Read 195 lines ][0m[H[7m  GNU nano 2.9.3                                         baseline.py                                                    [1;119H[0m[28B[7m^G[0m Get Help    [7m^O[0m Write Out   [7m^W[0m Where Is    [7m^K[0m Cut Text    [7m^J[0m Justify     [7m^C[0m Cur Pos     [7mM-U[0m Undo[7C[7mM-A[0m Mark Text
+[7m^X[0m Exit[8C[7m^R[0m Read File   [7m^\[0m Replace     [7m^U[0m Uncut Text  [7m^T[0m To Linter   [7m^_[0m Go To Line  [7mM-E[0m Redo[7C[7mM-6[0m Copy Text[A[A[25A[1m[36mimport[39m[0m torch
+[1m[36mimport[39m[0m torch.nn [1m[36mas[39m[0m nn
+[1m[36mimport[39m[0m torchvision.models [1m[36mas[39m[0m models
+[1m[36mfrom[39m[0m torch.nn.utils.rnn [1m[36mimport[39m[0m pack_padded_sequence
+[1m[36mfrom[39m[0m torch.utils.data [1m[36mimport[39m[0m WeightedRandomSampler
+[1m[36mfrom[39m[0m torch.autograd [1m[36mimport[39m[0m Variable
+[1m[36mfrom[39m[0m gensim.models [1m[36mimport[39m[0m Word2Vec
+[1m[36mimport[39m[0m numpy [1m[36mas[39m[0m np
+
+
+[1m[36mclass[39m[0m EncoderCNN(nn.Module):[24D
+[1m[36mdef[34m __init__[39m[0m(self, embedding_size):[31D
+super(EncoderCNN, self).__init__()[34D
+self.resnet = self.load_encoder()[33D
+self.linear = nn.Linear(self.infeature, embedding_size)[55D
+self.bn = nn.BatchNorm1d(embedding_size, momentum=0.01)[20;5H[1m[36mdef[34m load_encoder[39m[0m(self, backbone=[1m[32m'resnet50'[39m[0m):[40D
+pretrained_net = models.resnet50(pretrained=[1m[35mTrue[39m[0m)[49D
+self.infeature= pretrained_net.fc.in_features[45D
+encoder = nn.Sequential()[25;9H[1m[36mif[39m[0m backbone.startswith([1m[32m'res'[39m[0m):[26D
+[1m[36mfor[39m[0m idx, layer [1m[36min[39m[0m enumerate(pretrained_net.children()):[52D
+[1m[31m # Change the first conv and last linear layer[24A[39m[0m[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B[3;27r[3;1H[13M[24B[H[15;17H[1m[36mif[39m[0m isinstance(layer, nn.Linear) == [1m[35mFalse[39m[0m:[37D
+encoder.add_module(str(idx), layer)[47D
+[1m[36melif[39m[0m backbone.startswith([1m[32m'vgg'[39m[0m):[28D
+encoder=pretrained_net.features[35D
+[1m[36mreturn[39m[0m encoder[21;5H[1m[36mdef[34m forward[39m[0m(self, images):[22D
+[1m[36mwith[39m[0m torch.no_grad():[17D
+features = self.resnet(images)[34D
+features = features.reshape(features.size(0), -1)[49D
+features = self.linear(features)[32D
+features = self.bn(features)[11A[?12l[?25h[?25l[28;1H[K[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B[28;1H[3;28r[3;1H[13M[25B[H[15;9H[1m[36mreturn[39m[0m features
+
+
+[1m[36mclass[39m[0m DecoderLSTM(nn.Module):[25D
+[1m[36mdef[34m __init__[39m[0m(self,[5D
+embedding_size,[15D
+hidden_size,[12D
+vocab_size,[11D
+num_layers,[11D
+use_word2vec=[1m[35mFalse[39m[0m):[29D
+super(DecoderLSTM, self).__init__()[27;9H[1m[36mif[39m[0m use_word2vec == [1m[35mTrue[39m[0m:[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;13H[1m[36mtry[39m[0m:
+w2v = Word2Vec.load([16D
+[1m[32m'./data/w2v_'[39m[0m + str(embedding_size) + [1m[32m'.model'[39m[0m)[51D
+self.embedding = nn.Embedding.from_pretrained(w2v.wv)[53D
+[1m[36mfor[39m[0m param [1m[36min[39m[0m self.embedding.parameters():[37D
+param.requires_grad = [1m[35mFalse[35D
+[36mexcept[39m[0m:
+[1m[36mraise[39m[0m NotImplementedError[33D
+[1m[36melse[39m[0m:
+self.embedding = nn.Embedding(vocab_size, embedding_size)[26;9Hself.lstm = nn.LSTM(embedding_size, hidden_size,[28D
+num_layers, batch_first=[1m[35mTrue[39m[0m)[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;9Hself.linear = nn.Linear(hidden_size, vocab_size)[48D
+self.max_length = 99 [1m[31m # max_length[18;5H[36mdef[34m forward[39m[0m(self, features, captions, lengths, states=[1m[35mNone[39m[0m):[56D
+hiddens = [][12D
+embeddings = self.embedding(captions)[37D
+embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)[62D
+packed = pack_padded_sequence(embeddings, lengths, batch_first=[1m[35mTrue[39m[0m)[24;9Hinputs_iter = packed[0][23D
+batch_size_iter = packed[1][27;8H[1m[31m # for i in range(max(lengths)):[12A[39m[0m[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;8H[1m[31m # for i in range(len(packed)):[31D
+ #     # hidden, states = self.lstm(embeddings[:,i].unsqueeze(1), states)[73D
+ #     print("hidden shape: ", hidden.shape)[44D
+ #     hiddens.append(hidden)[29D
+ # hiddens = torch.cat(hiddens,dim=1)[37D
+ # print("hiddens shape: ", hiddens.shape)[42D
+ # hiddens = Variable(hiddens, requires_grad=[35mTrue[31m)[23;9H[39m[0mhiddens, _ = self.lstm(packed)[30D
+outputs = self.linear(hiddens[0])[33D
+[1m[36mreturn[39m[0m outputs[27;5H[1m[36mdef[34m sample[39m[0m(self,[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;16Hfeatures,[9D
+states=[1m[35mNone[39m[0m,[12D
+stochastic=[1m[35mFalse[39m[0m,[17D
+temperature=1):[22D
+sampled_ids = [][16D
+inputs = features.unsqueeze(1)[22;9H[1m[36mfor[39m[0m i [1m[36min[39m[0m range(self.max_length):[28D
+hiddens, states = self.lstm(inputs, states)[43D
+outputs = self.linear(hiddens.squeeze(1))[41D
+
+[1m[36mif[39m[0m stochastic == [1m[35mTrue[39m[0m:[18D
+outputs = outputs / temperature[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;17Hpredicted = WeightedRandomSampler([30D
+torch.nn.functional.softmax(outputs, dim=2), outputs.shape[2])[70D
+[1m[36melse[39m[0m:
+_, predicted = outputs.max(1)[33D
+
+sampled_ids.append(predicted)[29D
+inputs = self.embedding(predicted)[34D
+inputs = inputs.unsqueeze(1)[24;9Hsampled_ids = torch.stack(sampled_ids, 1)[41D
+[1m[36mreturn[39m[0m sampled_ids[10A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[14B[1m[36mclass[39m[0m DecoderRNN(nn.Module):[24D
+[1m[36mdef[34m __init__[39m[0m(self,[5D
+embedding_size,[15D
+hidden_size,[12D
+vocab_size,[11D
+num_layers,[11D
+use_word2vec=[1m[35mFalse[39m[0m):[29D
+super(DecoderRNN, self).__init__()[24;9H[1m[36mif[39m[0m use_word2vec == [1m[35mTrue[39m[0m:[20D
+[1m[36mtry[39m[0m:
+w2v = Word2Vec.load([16D
+[1m[32m'./data/w2v_'[39m[0m + str(embedding_size) + [1m[32m'.model'[39m[0m)[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;17Hself.embedding = nn.Embedding.from_pretrained(w2v.wv)[57D
+[1m[36mexcept[39m[0m:
+[1m[36mraise[39m[0m NotImplementedError[33D
+[1m[36melse[39m[0m:
+self.embedding = nn.Embedding(vocab_size, embedding_size)[21;9Hself.rnn = nn.RNN(embedding_size, hidden_size,[28D
+num_layers, batch_first=[1m[35mTrue[39m[0m)[47D
+self.linear = nn.Linear(hidden_size, vocab_size)[48D
+self.max_length = 99 [1m[31m # max_length[26;5H[36mdef[34m forward[39m[0m(self,[5D
+features,[12A[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25ls[?12l[?25h[?25le[?12l[?25h[?25ll[?12l[?25h[?25lf[?12l[?25h[?25l.[?12l[?25h[?25le[?12l[?25h[?25lm[?12l[?25h[?25lb[?12l[?25h[?25le[?12l[?25h[?25ld[?12l[?25h[?25ld[?12l[?25h[?25li[?12l[?25h[?25ln[?12l[?25h[?25lg[?12l[?25h[?25l [?12l[?25h[?25l=[?12l[?25h[?25l [?12l[?25h[?25ln[?12l[?25h[?25ln[?12l[?25h[?25l.[?12l[?25h[?25lE[?12l[?25h[?25lm[?12l[?25h[?25lb[?12l[?25h[?25le[?12l[?25h[?25ld[?12l[?25h[?25ld[?12l[?25h[?25li[?12l[?25h[?25ln[?12l[?25h[?25lg[?12l[?25h[?25l.[?12l[?25h[?25lf[?12l[?25h[?25lr[?12l[?25h[?25lo[?12l[?25h[?25lm[?12l[?25h[?25l_[?12l[?25h[?25lp[?12l[?25h[?25lr[?12l[?25h[?25le[?12l[?25h[?25lt[?12l[?25h[?25lr[?12l[?25h[?25la[?12l[?25h[?25li[?12l[?25h[?25ln[?12l[?25h[?25le[?12l[?25h[?25ld[?12l[?25h[?25l([?12l[?25h[?25lw[?12l[?25h[?25l2[?12l[?25h[?25lv[?12l[?25h[?25l.[?12l[?25h[?25lw[?12l[?25h[?25lv[?12l[?25h[?25l)[?12l[?25h[?25l[50D
+[?12l[?25h[?25l[22C
+[?12l[?25h[?25l
+[?12l[?25h[?25l[17;42H[?12l[?25h[?25l[1;111H[7mModified[0m[17B[18;27r[18;1HM[H[17B[?12l[?25h[?25l[H[17BM[H[18B[?12l[?25h[?25l[H[17B[2L[H[20B[?12l[?25h[?25l[H[28;1H[18;28r[28;1H
+[H[27;9Hself.max_length = 99 [1m[31m # max_length[7A[39m[0m[?12l[?25h[?25l[H[27B
+[H[18B[?12l[?25h[?25l[H[27B
+[H[27;5H[1m[36mdef[34m forward[39m[0m(self,[9A[?12l[?25h[?25l[H[27B
+[H[27;17Hfeatures,[17;42H[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[42m [49m [?12l[?25h[?25l [?12l[?25h[?25l[5Drais [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[42m                [49m [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[K[?12l[?25h[?25l[H[27B[17;28r[28;1H
+[H[27;17Hcaptions,[16;20H[?12l[?25h[?25l [?12l[?25h[?25l[6Dexcep [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[42m            [49m [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[K[?12l[?25h[?25l[H[27B[16;28r[28;1H
+[H[27;17Hlengths,[15;70H[?12l[?25h[?25l [?12l[?25h[?25l)[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[?12l[?25h[?25l[P[15C[?12l[?25h[?25l[P[14C[?12l[?25h[?25l[P[13C[?12l[?25h[?25l[P[12C[?12l[?25h[?25l[14;13H[?12l[?25h[?25l[13;13H[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[P[15C[?12l[?25h[?25l[P[14C[?12l[?25h[?25l[P[13C[?12l[?25h[?25l[P[12C[?12l[?25h[?25l
+[?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[C[?12l[?25h[?25l[?12l[?25h[?25l[P[19C[?12l[?25h[?25l[P[18C[?12l[?25h[?25l[P[17C[?12l[?25h[?25l[P[16C[?12l[?25h[?25l[P[15C[?12l[?25h[?25l[P[14C[?12l[?25h[?25l[P[13C[?12l[?25h[?25l[P[12C[?12l[?25h[?25l[P[11C[?12l[?25h[?25l[P[10C[?12l[?25h[?25l[P[9C[?12l[?25h[?25l[P[8C[?12l[?25h[?25l[P[7C[?12l[?25h[?25l[P[6C[?12l[?25h[?25l[P[5C[?12l[?25h[?25l[P    [?12l[?25h[?25l[P   [?12l[?25h[?25l[P  [?12l[?25h[?25l[P [?12l[?25h[?25l[P[?12l[?25h[?25l[H[27B[14;28r[28;1H
+[H[13;33H[1m[32m'./data/w2v_'[39m[0m + str(embedding_size) + [1m[32m'.model'[39m[0m)[27;17Hstates=[1m[35mNone[39m[0m):[13;33H[?12l[?25h[?25l[12;17H[?12l[?25h[?25l [?12l[?25h[?25ltr [?12l[?25h[?25l [?12l[?25h[?25l[42m            [49m [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l [?12l[?25h[?25l[K[?12l[?25h[?25l[H[27B[12;28r[28;1H
+[H[27;9Hhiddens = [][11;33H[?12l[?25h[?25l
+[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l[C[?12l[?25h[?25l [?12l[?25h[?25l+[?12l[?25h[?25l [?12l[?25h[?25ls[?12l[?25h[?25lt[?12l[?25h[?25lr[?12l[?25h[?25l([?12l[?25h[?25le[?12l[?25h[?25lm[?12l[?25h[?25lb[?12l[?25h[?25le[?12l[?25h[?25ld[?12l[?25h[?25ld[?12l[?25h[?25li[?12l[?25h[?25ln[?12l[?25h[?25lg[?12l[?25h[?25l_[?12l[?25h[?25l[16B[7mSave modified buffer?  (Answering "No" will DISCARD changes.)                                                           [29;1H Y[0m Yes[K[30;1H[7m N[0m No  [8C [7m^C[0m Cancel[K[28;63H[?12l[?25h[?25l[29;1H[7m^G[0m Get Help[19C[7mM-D[0m DOS Format[16C[7mM-A[0m Append[20C[7mM-B[0m Backup File[30;1H[7m^C[0m Cancel[7C              [7mM-M[0m Mac Format[16C[7mM-P[0m Prepend[19C[7m^T[0m To Files[A[A[7mFile Name to Write: baseline.py                              [0m[31C[?12l[?25h[?25l[K[1;119H[8D[7m        [0m[28;51H[7m[ Wrote 191 lines ][0m[J[30;120H[?12l[?25hcs253wi20ae@cs253wi20ae-15504:~/PA4$ [?5h[?5lnano baseline.pypython train_baseline.py[1;30r[30;1H
+loading annotations into memory...
+Done (t=0.97s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=1.15s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.45s)
+creating index...
+index created!
+Traceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 87, in main
+    len(vocab), args.num_layers, use_word2vec=True).to(device)
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 128, in __init__
+    self.embedding = nn.Embedding.from_pretrained(w2v.wv)
+  File "/opt/conda/lib/python3.7/site-packages/torch/nn/modules/sparse.py", line 157, in from_pretrained
+    assert embeddings.dim() == 2, \
+AttributeError: 'Word2VecKeyedVectors' object has no attribute 'dim'
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ pytorch --version
+bash: pytorch: command not found
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ i[Kpython
+Python 3.7.3 | packaged by conda-forge | (default, Jul  1 2019, 21:52:21) 
+[GCC 7.3.0] :: Anaconda, Inc. on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> imprt[K[Kort torch+
+  File "<stdin>", line 1
+    import torch+
+                ^
+SyntaxError: invalid syntax
+>>> import torch+[K
+>>> print()t)o)r)c)h).)v)e)r)s)i)o)n)()))
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'module' object is not callable
+>>> print(torch.version()))[K[P)_)_)_version__)_version__)
+1.3.1
+>>> exit
+Use exit() or Ctrl-D (i.e. EOF) to exit
+>>> exit()
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ pythonorch --versionhon train_baseline.py[8Pnano baseline.py
+[H[?25l[H[2J[28;53H[7m[ Reading File ][0m[17D[7m[ Read 191 lines ][0m[H[7m  GNU nano 2.9.3                                         baseline.py                                                    [1;119H[0m[28B[7m^G[0m Get Help    [7m^O[0m Write Out   [7m^W[0m Where Is    [7m^K[0m Cut Text    [7m^J[0m Justify     [7m^C[0m Cur Pos     [7mM-U[0m Undo[7C[7mM-A[0m Mark Text
+[7m^X[0m Exit[8C[7m^R[0m Read File   [7m^\[0m Replace     [7m^U[0m Uncut Text  [7m^T[0m To Linter   [7m^_[0m Go To Line  [7mM-E[0m Redo[7C[7mM-6[0m Copy Text[A[A[25A[1m[36mimport[39m[0m torch
+[1m[36mimport[39m[0m torch.nn [1m[36mas[39m[0m nn
+[1m[36mimport[39m[0m torchvision.models [1m[36mas[39m[0m models
+[1m[36mfrom[39m[0m torch.nn.utils.rnn [1m[36mimport[39m[0m pack_padded_sequence
+[1m[36mfrom[39m[0m torch.utils.data [1m[36mimport[39m[0m WeightedRandomSampler
+[1m[36mfrom[39m[0m torch.autograd [1m[36mimport[39m[0m Variable
+[1m[36mfrom[39m[0m gensim.models [1m[36mimport[39m[0m Word2Vec
+[1m[36mimport[39m[0m numpy [1m[36mas[39m[0m np
+
+
+[1m[36mclass[39m[0m EncoderCNN(nn.Module):[24D
+[1m[36mdef[34m __init__[39m[0m(self, embedding_size):[31D
+super(EncoderCNN, self).__init__()[34D
+self.resnet = self.load_encoder()[33D
+self.linear = nn.Linear(self.infeature, embedding_size)[55D
+self.bn = nn.BatchNorm1d(embedding_size, momentum=0.01)[20;5H[1m[36mdef[34m load_encoder[39m[0m(self, backbone=[1m[32m'resnet50'[39m[0m):[40D
+pretrained_net = models.resnet50(pretrained=[1m[35mTrue[39m[0m)[49D
+self.infeature= pretrained_net.fc.in_features[45D
+encoder = nn.Sequential()[25;9H[1m[36mif[39m[0m backbone.startswith([1m[32m'res'[39m[0m):[26D
+[1m[36mfor[39m[0m idx, layer [1m[36min[39m[0m enumerate(pretrained_net.children()):[52D
+[1m[31m # Change the first conv and last linear layer[24A[39m[0m[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[7B[?12l[?25h[?25l[H[26B[3;27r[3;1H[13M[24B[H[15;17H[1m[36mif[39m[0m isinstance(layer, nn.Linear) == [1m[35mFalse[39m[0m:[37D
+encoder.add_module(str(idx), layer)[47D
+[1m[36melif[39m[0m backbone.startswith([1m[32m'vgg'[39m[0m):[28D
+encoder=pretrained_net.features[35D
+[1m[36mreturn[39m[0m encoder[21;5H[1m[36mdef[34m forward[39m[0m(self, images):[22D
+[1m[36mwith[39m[0m torch.no_grad():[17D
+features = self.resnet(images)[34D
+features = features.reshape(features.size(0), -1)[49D
+features = self.linear(features)[32D
+features = self.bn(features)[11A[?12l[?25h[?25l[28;1H[K[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B[28;1H[3;28r[3;1H[13M[25B[H[15;9H[1m[36mreturn[39m[0m features
+
+
+[1m[36mclass[39m[0m DecoderLSTM(nn.Module):[25D
+[1m[36mdef[34m __init__[39m[0m(self,[5D
+embedding_size,[15D
+hidden_size,[12D
+vocab_size,[11D
+num_layers,[11D
+use_word2vec=[1m[35mFalse[39m[0m):[29D
+super(DecoderLSTM, self).__init__()[27;9H[1m[36mif[39m[0m use_word2vec == [1m[35mTrue[39m[0m:[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l[A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[27B[25A[13M[25B[H[15;13H[1m[36mtry[39m[0m:
+w2v = Word2Vec.load([16D
+[1m[32m'./data/w2v_'[39m[0m + str(embedding_size) + [1m[32m'.model'[39m[0m)[51D
+self.embedding = nn.Embedding.from_pretrained(w2v.wv)[53D
+[1m[36mfor[39m[0m param [1m[36min[39m[0m self.embedding.parameters():[37D
+param.requires_grad = [1m[35mFalse[35D
+[36mexcept[39m[0m:
+[1m[36mraise[39m[0m NotImplementedError[33D
+[1m[36melse[39m[0m:
+self.embedding = nn.Embedding(vocab_size, embedding_size)[26;9Hself.lstm = nn.LSTM(embedding_size, hidden_size,[28D
+num_layers, batch_first=[1m[35mTrue[39m[0m)[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;9Hself.linear = nn.Linear(hidden_size, vocab_size)[48D
+self.max_length = 99 [1m[31m # max_length[18;5H[36mdef[34m forward[39m[0m(self, features, captions, lengths, states=[1m[35mNone[39m[0m):[56D
+hiddens = [][12D
+embeddings = self.embedding(captions)[37D
+embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)[62D
+packed = pack_padded_sequence(embeddings, lengths, batch_first=[1m[35mTrue[39m[0m)[24;9Hinputs_iter = packed[0][23D
+batch_size_iter = packed[1][27;8H[1m[31m # for i in range(max(lengths)):[12A[39m[0m[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[H[26B
+[25A[13M[25B[H[15;8H[1m[31m # for i in range(len(packed)):[31D
+ #     # hidden, states = self.lstm(embeddings[:,i].unsqueeze(1), states)[73D
+ #     print("hidden shape: ", hidden.shape)[44D
+ #     hiddens.append(hidden)[29D
+ # hiddens = torch.cat(hiddens,dim=1)[37D
+ # print("hiddens shape: ", hiddens.shape)[42D
+ # hiddens = Variable(hiddens, requires_grad=[35mTrue[31m)[23;9H[39m[0mhiddens, _ = self.lstm(packed)[30D
+outputs = self.linear(hiddens[0])[33D
+[1m[36mreturn[39m[0m outputs[27;5H[1m[36mdef[34m sample[39m[0m(self,[12A[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l
+[?12l[?25h[?25l[1;111H[7mModified[0m[25B≈[?12l[?25h[?25l[K[?12l[?25h[?25l
+
+[7mSave modified buffer?  (Answering "No" will DISCARD changes.)                                                           [29;1H Y[0m Yes[K[30;1H[7m N[0m No  [8C [7m^C[0m Cancel[K[28;63H[?12l[?25h[?25l[29;1H[7m^G[0m Get Help[19C[7mM-D[0m DOS Format[16C[7mM-A[0m Append[20C[7mM-B[0m Backup File[30;1H[7m^C[0m Cancel[7C              [7mM-M[0m Mac Format[16C[7mM-P[0m Prepend[19C[7m^T[0m To Files[A[A[7mFile Name to Write: baseline.py                              [0m[31C[?12l[?25h[?25l[K[1;119H[8D[7m        [0m[28;51H[7m[ Wrote 191 lines ][0m[J[30;120H[?12l[?25hcs253wi20ae@cs253wi20ae-15504:~/PA4$ git stash[1;30r[30;1H
+Saved working directory and index state WIP on master: 0843caa Merge remote-tracking branch 'origin/master'
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ git pull
+remote: Enumerating objects: 5, done.[K
+remote: Counting objects:  20% (1/5)[Kremote: Counting objects:  40% (2/5)[Kremote: Counting objects:  60% (3/5)[Kremote: Counting objects:  80% (4/5)[Kremote: Counting objects: 100% (5/5)[Kremote: Counting objects: 100% (5/5), done.[K
+remote: Compressing objects: 100% (1/1)[Kremote: Compressing objects: 100% (1/1), done.[K
+remote: Total 3 (delta 2), reused 3 (delta 2), pack-reused 0[K
+Unpacking objects:  33% (1/3)   Unpacking objects:  66% (2/3)   Unpacking objects: 100% (3/3)   Unpacking objects: 100% (3/3), done.
+From https://github.com/cse253-team-repo/PA4
+   0843caa..a56fccf  master     -> origin/master
+Updating 0843caa..a56fccf
+Fast-forward
+ baseline.py | 1 [32m+[39m
+ 1 file changed, 1 insertion(+)
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ [?5h[?5l[A[K[K[?5h[?5lpython train_baseline.py
+loading annotations into memory...
+Done (t=1.02s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.97s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.42s)
+creating index...
+index created!
+Traceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 86, in main
+    decoder = DecoderRNN(args.embedding_size, args.hidden_size,
+NameError: name 'DecoderRNN' is not defined
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ python train_baseline.py
+loading annotations into memory...
+Done (t=0.93s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.94s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.37s)
+creating index...
+index created!
+Traceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 87, in main
+    len(vocab), args.num_layers, use_word2vec=True).to(device)
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 129, in __init__
+    w2v = gensim.models.KeyedVectors.load_word2vec_format('./data/w2v_' + str(embedding_size) + '.model')
+  File "/datasets/home/47/947/cs253wi20ae/.local/lib/python3.7/site-packages/gensim/models/keyedvectors.py", line 1498, in load_word2vec_format
+    limit=limit, datatype=datatype)
+  File "/datasets/home/47/947/cs253wi20ae/.local/lib/python3.7/site-packages/gensim/models/utils_any2vec.py", line 343, in _load_word2vec_format
+    header = utils.to_unicode(fin.readline(), encoding=encoding)
+  File "/datasets/home/47/947/cs253wi20ae/.local/lib/python3.7/site-packages/gensim/utils.py", line 359, in any2unicode
+    return unicode(text, encoding, errors=errors)
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0x80 in position 0: invalid start byte
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ python train_baseline.py
+loading annotations into memory...
+Done (t=0.89s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=1.21s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.41s)
+creating index...
+index created!
+Traceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 87, in main
+    len(vocab), args.num_layers, use_word2vec=True).to(device)
+  File "/datasets/home/home-01/47/947/cs253wi20ae/PA4/baseline.py", line 130, in __init__
+    print(w2v.shape)
+AttributeError: 'Word2Vec' object has no attribute 'shape'
+cs253wi20ae@cs253wi20ae-15504:~/PA4$ python train_baseline.py
+loading annotations into memory...
+Done (t=0.93s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=1.03s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.47s)
+creating index...
+index created!
+Traceback (most recent call last):
+  File "train_baseline.py", line 186, in <module>
+    main(args)
+  File "train_baseline.py", line 87, in main
+    len(vocab), args.num_layers, use_word2vec=True).to(device)
+  File 

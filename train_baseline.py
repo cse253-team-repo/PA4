@@ -83,8 +83,7 @@ def main(args):
                               vocab, transform, args.batch_size, shuffle=False, num_workers=args.num_workers)
 
     encoder = EncoderCNN(args.embedding_size).to(device)
-    decoder = DecoderLSTM(args.embedding_size, args.hidden_size,
-                          len(vocab), args.num_layers).to(device)
+    decoder = DecoderLSTM(args.embedding_size, args.hidden_size,len(vocab), args.num_layers, use_word2vec=True).to(device)
 
     criterion = nn.CrossEntropyLoss()
     params = list(encoder.parameters()) + list(decoder.parameters())
