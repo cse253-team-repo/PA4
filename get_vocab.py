@@ -9,7 +9,6 @@ from gensim.models import Word2Vec
 import os
 
 class Vocabulary(object):
-
     def __init__(self):
         self.word2idx = {}
         self.idx2word = {}
