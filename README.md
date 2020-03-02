@@ -4,7 +4,7 @@
 
 ### Configuration file
 
-The configuration files are stored in the directory `config/config.yaml`. To utilize the model pass the correct configuration file to the scripts. 
+The configuration files are stored in the directory `config/config.yaml`. To utilize the model pass the correct configuration file to the scripts. The specified hyperparameters are specialized for training process. 
 
 ### Train the model
 
