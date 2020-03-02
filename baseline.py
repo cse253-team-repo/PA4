@@ -6,6 +6,7 @@ from torch.utils.data import WeightedRandomSampler
 from torch.autograd import Variable
 from gensim.models import Word2Vec
 import numpy as np
+import pdb
 
 class EncoderCNN(nn.Module):
     def __init__(self, embedding_size):
@@ -123,6 +124,7 @@ class DecoderRNN(nn.Module):
         super(DecoderRNN, self).__init__()
 
         if use_word2vec == True:
+            pdb.set_trace()
             try:
                 w2v = Word2Vec.load(
                     './data/w2v_' + str(embedding_size) + '.model')
@@ -192,3 +194,7 @@ class CaptionCNNRNN(nn.Module):
         features = self.encoder(images)
         outputs = self.decoder(features, captions, lengths)
         return outputs
+
+    def load_model_state(self, model_path):
+        self.encoder.load_state_dict(torch.load(args.model_path+'encoder-baseline'))
+        self.decoder.load_state_dict(torch.load(args.model_path+'decoder-baseline'))

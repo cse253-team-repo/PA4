@@ -12,7 +12,9 @@ from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
 from attrdict import AttrDict
 from utils import *
+import tqdm
 import pdb
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -75,10 +77,9 @@ class Train:
         self.test_loader = get_loader(args.valid_image_dir, args.valid_caption_path, self.test_ids,
                                   self.vocab, self.transform, args.batch_size, shuffle=False, num_workers=args.num_workers)
 
+
     def step(self):
         model = CaptionCNNRNN(self.args, len(self.vocab)).to(self.device)
-
-
         criterion = nn.CrossEntropyLoss()
         params = list(model.parameters())
         optimizer = torch.optim.Adam(params, lr=self.args.learning_rate)
@@ -102,10 +103,6 @@ class Train:
                 training_losses_epoch.append(loss.item())
                 if i % self.args.log_step == 0:
                     print("Epoch: {}, Iteration: {}, Loss: {}, Perplexity: {}".format(epoch, i, np.exp(loss.item())))
-
-
-
-
             training_loss = np.mean(training_losses_epoch)
             training_losses.append(training_loss)
             valid_loss = compute_valid_loss(model, self.valid_loader, vocab)
