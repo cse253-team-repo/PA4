@@ -24,7 +24,7 @@ def compute_valid_loss(model, valid_loader, vocab):
     criterion = nn.CrossEntropyLoss()
     losses = []
     with torch.no_grad():
-        for i, (images, captions, lengths) in enumerate(valid_loader):
+        for i, (images, captions, lengths, ann_id) in enumerate(valid_loader):
             images = images.to(device)
             captions = captions.to(device)
             targets = pack_padded_sequence(
@@ -88,7 +88,7 @@ class Train:
         for epoch in range(self.args.num_epochs):
             training_losses_epoch = []
 
-            for i, (images, captions, lengths) in enumerate(self.train_loader):
+            for i, (images, captions, lengths, ann_ids) in enumerate(self.train_loader):
                 model.train()
                 images = images.to(self.device)
                 captions = captions.to(self.device)
