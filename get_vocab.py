@@ -9,7 +9,6 @@ from gensim.models import Word2Vec
 import os
 
 class Vocabulary(object):
-    """Simple vocabulary wrapper."""
 
     def __init__(self):
         self.word2idx = {}
@@ -31,10 +30,8 @@ class Vocabulary(object):
         return len(self.word2idx)
 
 def build_vocab(json, threshold, subset_id, embedding_size):
-    """Build a simple vocabulary wrapper and word2vec model."""
     coco = COCO(json)
     counter = Counter()
-    ids = coco.anns.keys()
     sentences = []
     with open("data/annotations/ids_train.json", 'rb') as f:
         dic = js.load(f)
@@ -48,14 +45,9 @@ def build_vocab(json, threshold, subset_id, embedding_size):
         sentences.append(caption.lower().split())
         tokens = nltk.tokenize.word_tokenize(caption.lower())
         counter.update(tokens)
-
-        if (i+1) % 1000 == 0:
-            print("[{}/{}] Tokenized the captions.".format(i+1, len(subset_ids)))
-
-    # If the word frequency is less than 'threshold', then the word is discarded.
+        
     words = [word for word, cnt in counter.items() if cnt >= threshold]
 
-    # Create a vocab wrapper and add some special tokens.
     vocab = Vocabulary()
     vocab.add_word('<pad>')
     vocab.add_word('<start>')
