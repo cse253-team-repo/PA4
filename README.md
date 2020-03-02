@@ -14,4 +14,12 @@ To train the model, pass correct yaml file to the scripts and run the following 
 python3 train_baseline.py
 ```
 
-To use the LSTM model modefy 
+We design a vanilla RNN and a LSTM decoder to reconstruct the text caption form corresponding images
+
+### Model evaluation
+
+```
+python test.py
+```
+
+It loads the specified model path and generate the text description. A temperature score
