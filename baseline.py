@@ -50,9 +50,9 @@ class DecoderLSTM(nn.Module):
 
         if use_word2vec == True:
             try:
-                w2v = Word2Vec.load(
-                    './data/w2v_' + str(embedding_size) + '.model')
-                self.embedding = nn.Embedding.from_pretrained(w2v.wv)
+                w2v = Word2Vec.load('./data/w2v_' + str(embedding_size) + '.model')
+                w2v_weights = torch.FloatTensor(w2v.wv.vectors)
+                self.embedding = nn.Embedding.from_pretrained(w2v_weights)
                 for param in self.embedding.parameters():
                     param.requires_grad = False
             except:
@@ -126,9 +126,9 @@ class DecoderRNN(nn.Module):
         if use_word2vec == True:
             pdb.set_trace()
             try:
-                w2v = Word2Vec.load(
-                    './data/w2v_' + str(embedding_size) + '.model')
-                self.embedding = nn.Embedding.from_pretrained(w2v.wv)
+                w2v = Word2Vec.load('./data/w2v_' + str(embedding_size) + '.model')
+                w2v_weights = torch.FloatTensor(w2v.wv.vectors)
+                self.embedding = nn.Embedding.from_pretrained(w2v_weights)
                 for param in self.embedding.parameters():
                     param.requires_grad = False
             except:
@@ -185,9 +185,15 @@ class CaptionCNNRNN(nn.Module):
                  args,
                  len_vocab):
         super(CaptionCNNRNN, self).__init__()
+<<<<<<< HEAD
         self.encoder = EncoderCNN(args.embedding_size)
         self.decoder = DecoderRNN(args.embedding_size, args.hidden_size,
                              len_vocab, args.num_layers, use_word2vec=True)
+=======
+        self.encoder = EncoderCNN(args.embed_size)
+        self.decoder = DecoderRNN(args.embed_size, args.hidden_size,
+                             len_vocab, args.num_layers, use_word2vec=False)
+>>>>>>> refs/remotes/origin/master
         self.sample = self.decoder.sample
 
     def forward(self,images,captions, lengths):
