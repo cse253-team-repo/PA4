@@ -101,8 +101,10 @@ class DecoderLSTM(nn.Module):
 
             if stochastic == True:
                 outputs = outputs / temperature
-                predicted = WeightedRandomSampler(
-                    torch.nn.functional.softmax(outputs, dim=2), outputs.shape[2])
+                # print("outputd: ",outputs.shape)
+                predicted = torch.Tensor(list(WeightedRandomSampler(
+                    torch.nn.functional.softmax(outputs, dim=1), 1))).long().cuda()
+                predicted = predicted.squeeze()
             else:
                 _, predicted = outputs.max(1)
 
@@ -170,8 +172,11 @@ class DecoderRNN(nn.Module):
             outputs = self.linear(hiddens.squeeze(1))
 
             if stochastic == True:
-                predicted = WeightedRandomSampler(
-                    torch.nn.functional.softmax(outputs, dim=2), outputs.shape[2])
+                outputs = outputs / temperature
+                # print("outputd: ",outputs.shape)
+                predicted = torch.Tensor(list(WeightedRandomSampler(
+                    torch.nn.functional.softmax(outputs, dim=1), 1))).long().cuda()
+                predicted = predicted.squeeze()
             else:
                 _, predicted = outputs.max(1)
             sampled_ids.append(predicted)
